@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title>CAE</title>
+
+        <script src="general/functions.js"></script>
+
+        <script src="general/canvas.js"></script>
+        <script src="general/grid.js"></script>
+        <script src="general/vector.js"></script>
+        
+        <script src="filters/TFR.js"></script>
+
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            canvas {
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- <h1>Computer Aided Eletronics</h1> -->
+        <script defer>
+
+            // create a mouse object
+            const mouse = {
+                x: 0,
+                y: 0,
+                clickedX: 0,
+                clickedY: 0,
+                down: false
+            };
+            // create mouse listeners
+            document.onmousemove = (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            };
+            document.onmousedown = () => {
+                mouse.clickedX = mouse.x;
+                mouse.clickedY = mouse.y;
+                mouse.down = true;
+            };
+            document.onmouseup = () => {mouse.down = false;}
+
+            // create a layered canvas
+            const windowView = new Layered();
+            windowView.addLayer(new Graph(-1, -1), "background"); // static background
+            windowView.addLayer(new Canvas(-1, -1), "foreground"); // updateable foreground
+            windowView.addLayer(new Canvas(-1, -1), "ui"); // user interface layer
+
+            // set origo to the center of the screen
+            windowView.callOn(layers => layers.origo(window.innerWidth/2, window.innerHeight/2), "background", "foreground");
+            
+            // Undepended
+            const opoint = new Grid(0, 0);
+            const arm1 = new Vector(100, degToRad(-90));
+            // Depended
+            const arm2 = new Vector(75, degToRad(-90));
+            const arm3 = new Vector(50, degToRad(-90));
+            const direct = new Vector(0, 0);
+            const hand = new Grid(0, 0);
+
+            // Other
+            let lastStep = -2; // step cannot be -2, it will therefor differ first time
+
+            // use loop with a framerate
+            const program = loop((status) => {
+                const {frame, fps, time, delta, animateId, steps} = status;
+                // update the ui layer
+                // only update the ui layer if the steps has changed
+                if(lastStep != steps) windowView.callOn(ui => {
+                    ui.clear();
+                    // stop by calling step 1, so that the canvas can update once befor halting (eg. updating text on button)
+                    if(steps === 0) ui.drawButton("Start", 10, 10, 100, 40, undefined, undefined, () => program.start());
+                    else ui.drawButton("Stop", 10, 10, 100, 40, undefined, undefined, () => program.step(1));
+                }, "ui");
+                lastStep = steps;
+
+                windowView.callOn(foreground => {
+                    arm1.rotate(0.01);
+                    arm2.rotate(0.01 + 0.005);
+                    arm3.rotate(0.01 + 0.005 + 0.005);
+                    arm2.pathify(arm1);
+                    arm3.pathify(arm2);
+                    
+                    foreground.clear();
+                    hand.cordinate(arm2.getPoint());
+                    direct.point(hand);
+                    foreground.drawPoint(hand);
+                    foreground.drawVector(direct, "#00ff00");
+                    hand.cordinate(arm3.getPoint());
+                    direct.point(hand);
+                    foreground.drawPoint(hand);
+                    foreground.drawVector(direct, "#00ff00");
+    
+                    foreground.drawPoint(opoint, "#0000ff");
+                    foreground.drawVector(arm1, arm1.isParallel(arm3) ? "#ff00ff" :"#ff0000");
+                    foreground.drawVector(arm2, "#ff0000");
+                    foreground.drawVector(arm3, arm3.isParallel(arm1) ? "#ff00ff" : "#ff0000");
+
+                }, "foreground");
+            }, 24);
+
+            // load the program
+            program.step(1);
+            program.start();
+
+            // the onResize function is called when the window is resized but also when the canvas is loaded
+            onResize(() => {
+                // resize of cavas updates the relative position of origo
+                windowView.call(layers => {
+                    layers.resize();
+                });
+                windowView.callOn(background => {
+                    background.clear();
+                    background.drawGrid(10, 10, "#00000020");
+                    background.drawAxis(50, "#00000060", true);
+                }, "background");
+                windowView.callOn(ui => {
+                    program.stop();
+                    ui.clear();
+                    // stop by calling step 1, so that the canvas can update once befor halting (eg. updating text on button)
+                    if(program.status().steps === 0) ui.drawButton("Start", 10, 10, 100, 40, undefined, undefined, () => {
+                        program.step(-1);
+                        program.start();
+                        console.log("Started");
+                    });
+                }, "ui");
+            });
+            
+        </script>
+    </body>
+</html>
