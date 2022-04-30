@@ -1,5 +1,15 @@
-// Class for creating a canvas element
+/**
+ * Create a canvas with functions to better control the canvas
+ * @class Canvas
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API Canvas API on MDN}
+ */
 class Canvas {
+    /**
+     * Creates a canvas element with a given size
+     * @param  {number} width - negative number are summed to the width of the window
+     * @param  {number} height - negative number are summed to the height of the window
+     * @return {Canvas} this
+     */
     constructor(width, height) {
         this.orrigoX = 0;
         this.orrigoY = 0;
@@ -15,7 +25,14 @@ class Canvas {
         this.getCanvas = () => document.getElementById(this.canvas.id);
         return this;
     }
-    // draw a series of lines horizontally and vertically with a given spacing from origo
+    
+    /**
+     * Draws a grid on the canvas
+     * @param  {number} spacingX - the interval between the lines in the x axis
+     * @param  {number} spacingY - the interval between the lines in the y axis
+     * @param  {string} color="#000000FF" - the color of the grid
+     * @return {Canvas} this
+     */
     drawGrid(spacingX, spacingY, color = "#000000FF") {
         if(typeof spacingY != "number") {
             spacingY = spacingX;
@@ -37,8 +54,15 @@ class Canvas {
             this.context.lineTo(this.right, -i);
         }
         this.context.stroke();
+        return this;
     }
-    // draw axis with marks at given interval
+    
+    /**
+     * Draw axis with ticks and numbers
+     * @param  {number} interval - the interval between the ticks
+     * @param  {string} color="#000000FF" - the color of the axis
+     * @return {Canvas} this
+     */
     drawAxis(interval, color = "#000000FF") {
         this.context.strokeStyle = color;
         this.context.beginPath();
@@ -63,53 +87,116 @@ class Canvas {
         this.context.stroke();
         return this;
     }
-    // Draws a rectangle use origoX and origoY as the top left corner
+    
+    /**
+     * Draws a rectangle on the canvas
+     * @param  {number} x - the x coordinate of the top left corner
+     * @param  {number} y - the y coordinate of the top left corner
+     * @param  {number} width - the width of the rectangle
+     * @param  {number} height - the height of the rectangle
+     * @param  {string} color - the color of the rectangle
+     * @return {Canvas} this
+     */
     drawRect(x, y, width, height, color = "#000000FF") {
         this.context.fillStyle = color;
         this.context.fillRect(x, y, width, height);
+        return this;
     }
-    // Draws a circle
+    
+    /**
+     * Draws a circle on the canvas
+     * @param  {number} x - the x coordinate of the center of the circle
+     * @param  {number} y - the y coordinate of the center of the circle
+     * @param  {number} radius - the radius of the circle
+     * @param  {string} color - the color of the circle
+     * @return {Canvas} this
+     */
     drawCircle(x, y, radius, color = "#000000FF") {
         this.context.fillStyle = color;
         this.context.beginPath();
         this.context.ellipse(x, y, radius, radius, 0, 0, 2 * Math.PI);
         this.context.fill();
         this.context.closePath();
+        return this;
     }
-    // Draws a line
+
+    /** 
+     * Draws a line on the canvas
+     * @param {number} x1 - the x coordinate of the first point
+     * @param {number} y1 - the y coordinate of the first point
+     * @param {number} x2 - the x coordinate of the second point
+     * @param {number} y2 - the y coordinate of the second point
+     * @param {string} color - the color of the line
+     * @return {Canvas} this
+     */
     drawLine(x1, y1, x2, y2, color = "#000000FF") {
         this.context.strokeStyle = color;
         this.context.beginPath();
         this.context.moveTo(x1, y1);
         this.context.lineTo(x2, y2);
         this.context.stroke();
+        return this;
     }
-    // Draws a text
+    
+    /**
+     * Draw text on the canvas
+     * @param  {string} text - the text to be drawn
+     * @param  {number} x - the x coordinate of the top left corner of the text
+     * @param  {number} y - the y coordinate of the top left corner of the text
+     * @param  {string} color - the color of the text
+     * @return {Canvas} this
+     */
     drawText(text, x, y, color = "#000000FF") {
         this.context.fillStyle = color;
         this.context.fillText(text, x, y);
+        return this;
     }
-    // Clears the canvas
+    
+    /**
+     * Clears the canvas
+     * @return {Canvas} this
+     */
     clear() {
         this.context.clearRect(this.left, this.top, this.canvas.width, this.canvas.height);
+        return this;
     }
-    // draw a point form class grid or two points from class vector
+
+    /**
+     * Draws a point on the canvas
+     * @param  {Cordinate} point - the point to be translated
+     * @param  {string} color - the color of the point
+     * @return {Canvas} this
+     */
     drawPoint(point, color = "#000000FF") {
-        if(point instanceof Vector) { // Vector should be checked before grid, because vector is extended from grid
+        if(point instanceof Vector) { // Vector should be checked before Cordinate, because vector is extended from Cordinate
             const {x1, y1, x2, y2} = point.spacial();
             this.drawCircle(x1, y1, 3, color);
             this.drawCircle(x2, y2, 3, color);
-        } else if (point instanceof Grid) {
+        } else if (point instanceof Cordinate) {
             const {x, y} = point.getCordinate()
             this.drawCircle(x, y, 3, color);
         } else return new Error("point is not of proper type");
     }
-    //draw a vector form class vector
+
+    /**
+     * Draws a line representing a vector
+     * @param {Vector} vector - the vector to be drawn 
+     * @param {string} color - the color of the line
+     * @returns {Canvas} this
+     */
     drawVector(vector, color = "#000000FF") {
+        if(!(vector instanceof Vector)) return new Error("vector is not of proper type");
         const {x1, y1, x2, y2} = vector.spacial();
         this.drawLine(x1, y1, x2, y2, color);
+        return this;
     }
-    // Set origo of canvas to a given screen position
+    
+    /**
+     * Sets the origo of the canvas to a given screen position
+     * @param {number} x - the x coordinate of the new origo
+     * @param {number} y - the y coordinate of the new origo
+     * @return {Canvas} this
+     */
     origo(x, y) {
         this.origoX = x;
         this.origoY = y;
@@ -118,8 +205,15 @@ class Canvas {
         this.top = -y;
         this.bottom = this.canvas.height - y;
         this.context.translate(this.origoX, this.origoY);
+        return this;
     }
-    // resize to a width and height
+    
+    /**
+     * Resizes the canvas to a given width and height
+     * @param {number} width - the new width of the canvas
+     * @param {number} height - the new height of the canvas
+     * @return {Canvas} this
+     */
     resize(width=window.innerWidth, height=window.innerHeight) {
         let cv = this.getCanvas();
         // get the relative origo to old with and height (use this.origo)
@@ -132,12 +226,18 @@ class Canvas {
         this.origo(x * width, y * height);
         return this;
     }
-    // Draw text in a given position
-    drawText(text, x, y, color = "#000000FF") {
-        this.context.fillStyle = color;
-        this.context.fillText(text, x, y);
-    }
-    // Draw an interactive button
+    
+    /**
+     * Draws an interactive button
+     * @param {string} text - the text to be drawn
+     * @param {number} x - the x coordinate of the top left corner of the button
+     * @param {number} y - the y coordinate of the top left corner of the button
+     * @param {number} width - the width of the button
+     * @param {number} height - the height of the button
+     * @param {string} color - the color of the button
+     * @param {function} callback - the function to be called when the button is clicked
+     * @return {Canvas} this
+     */
     drawButton(text, x, y, width, height, color = "#FFFFFFFF", background = "#000000FF", callback = () => {}) {
         // rect with round corners
         this.context.fillStyle = background;
@@ -159,15 +259,33 @@ class Canvas {
         this.getCanvas().onclick = (e) => {
             if(e.x > x && e.x < x + width && e.y > y && e.y < y + height) callback();
         };
+        return this;
     }
 }
 
-// class that extends canvas but intended to draw graphs (like ossilisocpe)
+/**
+ * Class that extends Canvas but intended to draw graphs (like ossilisocpe)
+ * @extends Canvas
+ * @class Graph
+ */
 class Graph extends Canvas {
+    /**
+     * Creates a new graph
+     * @param {number} width - the width of the graph
+     * @param {number} height - the height of the graph
+     * @return {Graph} this
+     */
     constructor(width, height) {
         super(width, height);
+        return this;
     }
-    // Draw a series of points from a Series class
+    
+    /**
+     * Draws a graph (plotting)
+     * @param {Series} series - the series to be plotted
+     * @param {string} color - the color of the graph
+     * @return {Canvas} this
+     */
     plot(series, color = "#000000FF") {
         const {time, data} = series.getSeries();
         this.context.strokeStyle = color;
@@ -177,10 +295,18 @@ class Graph extends Canvas {
         this.context.stroke();
         return this;
     }
-    // Draw axis but add labels to the axis and option for numbering the marks
-    drawAxis(interval, color = "#000000FF", number = false) {
+    
+    /**
+     * Draws axis with labels and optional numbering
+     * @override
+     * @param {number} interval - the interval between the marks
+     * @param {string} color - the color of the axis
+     * @param {boolean} numbering - if true the marks will be numbered
+     * @returns {Canvas} this
+     */
+    drawAxis(interval, color = "#000000FF", numbering = false) {
         super.drawAxis(interval, color);
-        if(number) {
+        if(numbering) {
             this.context.font = "10px Arial";
             this.context.fillStyle = color;
             // Calculate the min and max axis number that would fit in the canvas
@@ -215,38 +341,73 @@ class Graph extends Canvas {
     }
 }
 
-// class that holds layers of canvasses or graphs
+/**
+ * Class that holds layers of canvasses or graphs
+ * @class Layer
+ */
 class Layered {
+    /**
+     * Creates a new layered object
+     * @return {Layered} this
+     */
     constructor() {
         this.layers = {};
+        return this;
     }
-    // Add a layer to the layers array
+
+    /**
+     * Adds a layer to the layers array
+     * @param {Canvas} layer - the layer to be added
+     * @param {string} name - the name of the layer
+     * @param {HTMLElement} appendTo - the html element to append the layer to, default is the body
+     * @returns {Layered} this
+     */
     addLayer(layer, name, appendTo = document.body) {
         this.layers[name] = layer;
         appendTo.appendChild(layer.canvas);
         return this;
     }
-    // return all layers in an array
+    
+    /**
+     * Get all the layers
+     * @returns {Layered[]} the layers array
+     */
     getLayers() {
         return Object.values(this.layers);
     }
-    // get all layers in an array
+    
+    /**
+     * Get all layers in an array
+     * @returns {string[]} an array of all layers
+     */
     getLayerNames() {
         return Object.keys(this.layers);
     }
-    // Call a function on all layers
-    // the func takes one argument which is the canvas class (layer)
+
+    /**
+     * Call a function on all layers
+     * @param {function} func - the function to be called
+     * @return {Layered} this
+     */
     call(func) {
         const layers = this.layers;
         this.getLayerNames().forEach(name => 
             func(layers[name])
         );
+        return this;
     }
-    // Call function on all specified layers (names)
+    
+    /**
+     * Call function on all specified layers (names)
+     * @param {function} func - the function to be called
+     * @param {...string} names - the names of the layers to be called
+     * @return {Layered} this
+     */
     callOn(func, ...names) {
         if(typeof func != "function") return new Error("not a function: " + func);
         const layers = this.layers;
         names.forEach(name => func(layers[name]));
+        return this;
     }
     
 }

@@ -1,38 +1,63 @@
-// create a sum expression that makes an array of the results
-function sum(callback, start, end) {
+/**
+ * (Mathmatical expression Sigma) returns an array of the results of the expression
+ * @param {function(n): any} callback - The expression to be evaluated called with n
+ * @param {number} start - "Safe" to use -Infinity
+ * @param {number} end - "Safe" to use Infinity
+ * @param {boolean} [intermitent=false] - Whether to return an imediate array or a number
+ * @returns {any[]|number} any[]|number
+ */
+function sum(callback, start, end, intermitent = false) {
     // function should handle +/-Infinity variable
     if(start === -Infinity) start = -Number.MAX_SAFE_INTEGER;
     if(end === Infinity) end = Number.MAX_SAFE_INTEGER;
     let sum = [];
     for (let n = start; n < end; n++) sum.push(callback(n));
+    // if intermitent is false, return the sum as an array
+    if(intermitent === true) return sum;
+    // else return the sum as a number
+    while(sum.length > 0) sum = sum.reduce((a, b) => a + b);
     return sum;
 }
 
-// generator function that returns a unique id
-// format as xxxx-yyyy
+/**
+ * Generator function that returns a unique id
+ * @description format: xxxx-yyyy
+ * @generator
+ * @yields {string} string
+ */
 function* idGenerator() {
     let id = 0;
     while (true) {
         yield (id++).toString().padStart(4, '0') + '-' + (id++).toString().padStart(4, '0');
     }
 }
+
 // create a global id generator
 const id = idGenerator();
 
-// global id generator
+/**
+ * Generates a id formatted xxxx-yyyy
+ * @returns {string} string
+ */
 function nextId() {
     return id.next().value;
 }
 
-// function that executes a callback on window resize or load
+/**
+ * Function that executes a callback on window resize or load
+ * @param {function} callback - The function to be executed
+ */
 function onResize(callback) {
     window.addEventListener('resize', callback);
     window.addEventListener('load', callback);
 }
 
-// function that executes a callback with a fixed framerate using requestAnimationFrame
-// the function should return a start stop and step function
-// the callback should be called with the frame number
+/**
+ * A function that executes a callback with a fixed framerate using requestAnimationFrame
+ * @param {function} callback - The function to be executed 
+ * @param {number} fps
+ * @returns {{step: (number) => {frame, fps, time, delta, animateId, steps}, status: () => {frame, fps, time, delta, animateId, steps}, start: () => {frame, fps, time, delta, animateId, steps}, stop: () => {frame, fps, time, delta, animateId, steps}}} {{step: (number) => {frame, fps, time, delta, animateId, steps}, status: () => {frame, fps, time, delta, animateId, steps}, start: () => {frame, fps, time, delta, animateId, steps}, stop: () => {frame, fps, time, delta, animateId, steps}}}
+ */
 function loop(callback, fps) {
     let animateId = null;
     let frame = 0;
@@ -40,7 +65,6 @@ function loop(callback, fps) {
     let delta = -1;
     let steps = -1;
 
-    // the looping control function
     const animate = () => {
         let now = performance.now();
         delta = now - time;
@@ -57,7 +81,6 @@ function loop(callback, fps) {
         }
     };
     
-    // user can control the loop with these functions
     return {
         start: function () {
             animate();
@@ -77,16 +100,29 @@ function loop(callback, fps) {
     };
 }
 
-// rad to deg
+/**
+ * Converts radians to degrees
+ * @param {number} rad - Radian value
+ * @returns {number} number
+ */
 function radToDeg(rad) {
     return rad * 180 / Math.PI;
 }
-//deg to rad
+
+/**
+ * Converts degrees to radians
+ * @param {number} deg - Degree value
+ * @returns {number} number
+ */
 function degToRad(deg) {
     return deg * Math.PI / 180;
 }
 
-// invert a hex color string
+/**
+ * Inverts a HEX color string
+ * @param {string} hex - HEX color string with #
+ * @returns {string} string
+ */
 function invertColorString(hex) {
     let r = (255 - parseInt(hex.substring(1, 3), 16)).toString(16).padStart(2, '0');
     let g = (255 - parseInt(hex.substring(3, 5), 16)).toString(16).padStart(2, '0');

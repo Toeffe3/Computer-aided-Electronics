@@ -1,82 +1,139 @@
+/**
+ * A matrix is a two-dimensional array of numbers.
+ * @see {@link https://en.wikipedia.org/wiki/Matrix_%28mathematics%29 Matrix on Wikipedia}
+ * @class Matrix
+ */
 class Matrix {
+    /**
+     * Create a matrix with a finite number of rows and columns.
+     * @constructor
+     * @param {number} rows - the number of rows
+     * @param {number} cols - the number of columns
+     * @returns {Matrix} this
+     */
     constructor(rows, cols) {
         this.rows = rows;
         this.cols = cols;
         this.data = [];
+        this.pure = true;
         for (let i = 0; i < rows; i++) {
             this.data[i] = [];
-            for (let j = 0; j < cols; j++) {
-                this.data[i][j] = 0;
+            for (let j = 0; j < cols; j++) this.data[i][j] = 0;
+        }
+        return this;
+    }
+
+    /**
+     * Check (and update) the purity of the matrix.
+     * @description A matrix is pure if all of its elements are numbers.
+     * @returns {boolean} boolean
+     */
+    checkPurity() {
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                if (typeof this.data[i][j] !== "number") {
+                    this.pure = false;
+                    return false;
+                }
             }
         }
+        this.pure = true;
+        return true;
     }
 
-    // set matrix element
-    set(i, j, value) {
-        this.data[i][j] = value;
+    /**
+     * Set the value of a matrix element.
+     * @param {number} row - the row index
+     * @param {number} column - the column index
+     * @param {number|any} value - the value to set
+     * @returns {Matrix} this
+     */
+    set(row, column, value) {
+        // if value is not a number, the matrix is not pure
+        if (typeof value !== "number") this.pure = false;
+        else if (!this.pure) this.checkPurity(); // if the matrix is not pure, check if the value replaces the unpure value
+        this.data[row][column] = value;
+        return this;
     }
 
-    // set matrix using an array
-    // if array is smaller than matrix, the rest of the matrix is set to 0
-    // if array is larger than matrix, the rest of the array is ignored
-    fromArray(array) {
-        let i = 0;
-        let j = 0;
-        for (let value of array) {
-            this.data[i][j] = value;
-            j++;
-            if (j === this.cols) {
-                j = 0;
-                i++;
+    /**
+     * Set the matrix using an array.
+     * @description Ignores any excess elements or missing elements.
+     * @param {number[][]|any[][]|number[]|any[]} array - the array to set the matrix to
+     * @param {number} [list] - if the array should be treated as a list
+     * @returns {Matrix} this
+     */
+    fromArray(array, list = flase) {
+        for (let row = 0; row < array.length; row++) {
+            for (let col = 0; col < array[row].length; col++) {
+                if (list === true) {
+                    //map 2d array indexs to 1d array indexes
+                    let i = row * this.cols + col;
+                    if (i > array.length) break;
+                    this.set(tr, tc, array[i]);
+                } else this.set(row, col, array[row][col]);
             }
         }
+        return this;
     }
 
-    // get matrix element
-    get(i, j) {
-        return this.data[i][j];
+    /**
+     * Get the value of a matrix element.
+     * @param {number} row - the row index
+     * @param {number} col - the column index
+     * @returns {number} number
+     */
+    get(row, col) {
+        return this.data[row][col];
     }
 
-    // get matrix as array in either 1 or 2 dimensions
-    // if 1D, the array is in row-major order
-    // if 2D, the array is in column-major order
+    /**
+     * Get the matrix as an array.
+     * @description The array is in; 1D: row-major order, 2D: column-major order.
+     * @param {1|2} [dim] - the dimension of the array
+     * @returns {number[]|number[][]} number[]|number[][]
+     */
     toArray2D(dim) {
         if (dim === 1) {
             let array = [];
-            for (let i = 0; i < this.rows; i++) 
-                for (let j = 0; j < this.cols; j++) 
+            for (let i = 0; i < this.rows; i++)
+                for (let j = 0; j < this.cols; j++)
                     array.push(this.data[i][j]);
             return array;
         } else if (dim === 2) return this.data;
         else throw new Error("Invalid dimension");
     }
 
-    // get matrix iterator
-    // also return the value of this
+    /**
+     * Get the matrix as a iterable object.
+     * @iterable
+     * @returns {Iterable} Iterable
+     */
     [Symbol.iterator]() {
-        let i = 0;
-        let j = 0;
-        return {
-            next: () => {
-                if (j === this.cols) {
-                    j = 0;
-                    i = (i + 1) % this.rows;
-                }
-                if (i >= this.rows) return {done: true};
-                return {
-                    value: {
-                        matrix: this,
-                        i: i,
-                        j: j,
-                        value: this.data[i][j]
-                    },
-                    done: false
-                };
-            }
-        };
+        return this.data[Symbol.iterator]();
     }
 
-    // copy a matrix
+    /**
+     * Get the matric as an generator.
+     * @description The generator is column-major order, and yields done when the matrix is exhausted.
+     * @generator
+     * @yields {{value: number|any, done: boolean}}
+     * @returns {Generator} Generator
+     */
+    *[Symbol.iterator]() {
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                yield {value: this.data[i][j], done: false};
+            }
+        }
+        //yield done
+        yield { value: null, done: true };
+    }
+
+    /**
+     * Copy the matrix.
+     * @returns {Matrix} Matrix
+     */
     copy() {
         let newMatrix = new Matrix(this.rows, this.cols);
         for (let i = 0; i < this.rows; i++)
@@ -85,25 +142,90 @@ class Matrix {
         return newMatrix;
     }
 
-    // return a gaussian matrix
-    static gaussian(rows, cols) {
+    /**
+     * Returns a matrix of ones.
+     * @static
+     * @param {number} rows - the number of rows
+     * @param {number} cols - the number of columns
+     * @returns {Matrix} Matrix
+     */
+    static ones(rows, cols) {
         let matrix = new Matrix(rows, cols);
         for (let i = 0; i < rows; i++)
             for (let j = 0; j < cols; j++)
-                matrix.data[i][j] = Math.random() * 2 - 1;
+                matrix.data[i][j] = 1;
         return matrix;
     }
 
-    // return a golden ratio matrix
-    static golden(rows, cols) {
+    /**
+     * Returns a identity matrix.
+     * @static
+     * @param {number} rows - the number of rows
+     * @param {number} cols - the number of columns
+     * @returns {Matrix} Matrix
+     */
+    static identity(rows, cols) {
         let matrix = new Matrix(rows, cols);
         for (let i = 0; i < rows; i++)
             for (let j = 0; j < cols; j++)
-                matrix.data[i][j] = (i + j) % 2 === 0 ? 1 : -1;
+                matrix.data[i][j] = i === j ? 1 : 0;
         return matrix;
     }
 
-    // transpose matrix
+    /**
+     * Returns a shift matrix.
+     * @static
+     * @param {number} rows - the number of rows
+     * @param {number} cols - the number of columns
+     * @param {'horizontal'|'vertical'} direction - the direction of the shift
+     * @returns {Matrix} Matrix
+     */
+    static shift(rows, cols, direction) {
+        let matrix = new Matrix(rows, cols);
+        for (let i = 0; i < rows; i++)
+            for (let j = 0; j < cols; j++)
+                matrix.data[i][j] = direction === "horizontal" ? j : i;
+        return matrix;
+    }
+
+    /**
+     * Returns a commutation matrix
+     * @static
+     * @param {number} rows - the number of rows
+     * @param {number} cols - the number of columns
+     * @param {number} row - the row to swap
+     * @param {number} col - the column to swap
+     * @returns {Matrix} Matrix
+     */
+    static commutation(rows, cols, row, col) {
+        let matrix = new Matrix(rows, cols);
+        for (let i = 0; i < rows; i++)
+            for (let j = 0; j < cols; j++)
+                matrix.data[i][j] = i === row ? j : i === col ? row : i;
+        return matrix;
+    }
+
+    /**
+     * Returns a random matrix.
+     * @static
+     * @param {number} rows - the number of rows
+     * @param {number} cols - the number of columns
+     * @param {number} [min=0] - the minimum value
+     * @param {number} [max=1] - the maximum value
+     * @returns {Matrix} Matrix
+     */
+    static random(rows, cols, min = 0, max = 1) {
+        let matrix = new Matrix(rows, cols);
+        for (let i = 0; i < rows; i++)
+            for (let j = 0; j < cols; j++)
+                matrix.data[i][j] = Math.random() * (max - min) + min;
+        return matrix;
+    }
+
+    /**
+     * Transpose the matrix.
+     * @returns {Matrix} this
+     */
     transpose() {
         let newMatrix = new Matrix(this.cols, this.rows);
         for (let i = 0; i < this.rows; i++)
@@ -112,7 +234,12 @@ class Matrix {
         return newMatrix;
     }
 
-    // flip the matrix horizontally/vertically or both
+    /**
+     * Flip the matrix either horizontally or vertically or both.
+     * @param {boolean} [horizontal=false] - flip horizontally
+     * @param {boolean} [vertical=false] - flip vertically
+     * @returns {Matrix} this
+     */
     flip(horizontal, vertical) {
         if (horizontal) {
             for (let i = 0; i < this.rows; i++) {
@@ -135,69 +262,72 @@ class Matrix {
         return this;
     }
 
-
-    // add a number/constant to each element
-    add(value) {
-        for (let i = 0; i < this.rows; i++)
-            for (let j = 0; j < this.cols; j++)
-                this.data[i][j] += value;
+    /**
+     * Add a number/constant to each element or add a matrix to this matrix.
+     * @param {number|Matrix} element - the element to add
+     * @returns {Matrix} this
+     */
+    add(element) {
+        if (typeof element === "number") {
+            for (let i = 0; i < this.rows; i++)
+                for (let j = 0; j < this.cols; j++)
+                    this.data[i][j] += element;
+        } else if (element instanceof Matrix) {
+            if (element.rows !== this.rows || element.cols !== this.cols)
+                throw new Error("Matrices must be of the same size");
+            for (let i = 0; i < this.rows; i++)
+                for (let j = 0; j < this.cols; j++)
+                    this.data[i][j] += element.data[i][j];
+        } else
+            throw new Error("Invalid element");
         return this;
     }
 
-    // multiply each element by a number/constant
+    /**
+     * Multiply each element by a number/constant or multiply this matrix by a matrix.
+     * @param {number|Matrix} element - the element to multiply
+     * @returns {Matrix} this
+     */
     multiply(value) {
-        for (let i = 0; i < this.rows; i++)
-            for (let j = 0; j < this.cols; j++)
-                this.data[i][j] *= value;
+        if (typeof value === "number") {
+            for (let i = 0; i < this.rows; i++)
+                for (let j = 0; j < this.cols; j++)
+                    this.data[i][j] *= value;
+        } else if (value instanceof Matrix) {
+            if (value.rows !== this.rows || value.cols !== this.cols)
+                throw new Error("Matrices must be of the same size");
+            for (let i = 0; i < this.rows; i++)
+                for (let j = 0; j < this.cols; j++)
+                    this.data[i][j] *= value.data[i][j];
+        } else
+            throw new Error("Invalid element");
         return this;
     }
 
-    // add a matrix to this matrix
-    addMatrix(matrix) {
-        if (this.rows !== matrix.rows || this.cols !== matrix.cols)
-            throw new Error("Matrix dimensions do not match");
-        for (let i = 0; i < this.rows; i++)
-            for (let j = 0; j < this.cols; j++)
-                this.data[i][j] += matrix.data[i][j];
-        return this;
-    }
-
-    // multiply this matrix by a matrix
-    multiplyMatrix(matrix) {
-        if (this.cols !== matrix.rows)
-            throw new Error("Matrix dimensions do not match");
-        let newMatrix = new Matrix(this.rows, matrix.cols);
-        for (let i = 0; i < this.rows; i++)
-            for (let j = 0; j < matrix.cols; j++)
-                for (let k = 0; k < this.cols; k++)
-                    newMatrix.data[i][j] += this.data[i][k] * matrix.data[k][j];
-        return newMatrix;
-    }
-
-    // solve this matrix for a matrixVector
-    solve(matrixVector) {
-        // ensure that matrixVector is a matrixVector
-        if (!(matrixVector instanceof MatrixVector))
-            throw new Error("Invalid matrixVector");
-        // ensure that matrixVector is a column vector, if not warn and transpose
-        if (matrixVector.rows !== this.rows) {
-            console.warn("MatrixVector is not a column vector and will be transposed");
-            matrixVector = matrixVector.transpose();
+    /**
+     * Solve this matrix for a matrix of constants.
+     * @param {Matrix} constants - the matrix of constants
+     * @returns {Matrix} Matrix
+     * @throws {Error} if the matrix is not square
+     */
+    solve(constants) {
+        if (this.rows !== this.cols) throw new Error("Matrix must be square");
+        if (constants.rows !== this.rows || constants.cols !== 1) throw new Error("Matrix must be of the same size");
+        let matrix = new Matrix(this.rows, this.cols);
+        for (let i = 0; i < this.rows; i++) {
+            let row = [];
+            for (let j = 0; j < this.cols; j++) row.push(this.data[i][j]);
+            let solution = gauss(row, constants.data[i]);
+            for (let j = 0; j < this.cols; j++) matrix.data[i][j] = solution[j];
         }
-        let newMatrix = this.copy();
-        for (let i = 0; i < this.rows; i++)
-            newMatrix.data[i][i] -= 1;
-        let newMatrixVector = new Matrix(this.rows, 1);
-        for (let i = 0; i < this.rows; i++)
-            newMatrixVector.data[i][0] = matrixVector.data[i][0];
-        let newMatrixVector2 = newMatrix.solve(newMatrixVector);
-        let newMatrix2 = new Matrix(this.rows, 1);
-        for (let i = 0; i < this.rows; i++)
-            newMatrix2.data[i][0] = newMatrixVector2.data[i][0];
-        return newMatrix2;
+        return matrix;
     }
 
-    // gaussian elimination
+    /**
+     * Gaussian elimination.
+     * @returns {Matrix} Matrix
+     * @throws {Error} if the matrix is a singular matrix
+     */
     gaussianElimination() {
         let newMatrix = this.copy();
         for (let i = 0; i < this.rows; i++) {
@@ -209,8 +339,7 @@ class Matrix {
                     maxRow = j;
                 }
             }
-            if (max === 0)
-                throw new Error("Matrix is singular");
+            if (max === 0) throw new Error("Matrix is singular");
             if (maxRow !== i) {
                 let temp = newMatrix.data[i];
                 newMatrix.data[i] = newMatrix.data[maxRow];
@@ -223,71 +352,5 @@ class Matrix {
             }
         }
         return newMatrix;
-    }
-}
-
-class matrixVector {
-    // matrixVector is ALWAYS 1 dimensional
-    // construct a matrixVector fron 2 or more number of arguments
-    constructor(...args) {
-        // ensure that there are at least 2 arguments
-        if (args.length < 2) throw new Error("Invalid number of arguments");
-        // ensure that all arguments are numbers
-        for (let i = 0; i < args.length; i++) if (typeof args[i] !== "number") throw new Error("Invalid argument");
-        this.data = args;
-        this.rows = args.length;
-        this.cols = 1; // always 1
-    }
-
-    // set a value at a specific index
-    set(index, value) {
-        if (index < 0 || index >= this.rows) throw new Error("Invalid index");
-        if (typeof value !== "number") throw new Error("Invalid value");
-        this.data[index] = value;
-        return this;
-    }
-
-    // get a value at a specific index
-    get(index) {
-        if (index < 0 || index >= this.rows) throw new Error("Invalid index");
-        return this.data[index];
-    }
-
-    // get the magnitude of the vector
-    magnitude() {
-        let sum = 0;
-        for (let i = 0; i < this.rows; i++)
-            sum += this.data[i] * this.data[i];
-        return Math.sqrt(sum);
-    }
-
-    // get the unit vector of the vector
-    unitVector() {
-        let magnitude = this.magnitude();
-        let newMatrixVector = new MatrixVector();
-        for (let i = 0; i < this.rows; i++)
-            newMatrixVector.data[i] = this.data[i] / magnitude;
-        return newMatrixVector;
-    }
-
-    // convert this matrixVector to a matrix
-    toMatrix() {
-        let newMatrix = new Matrix(this.rows, 1);
-        for (let i = 0; i < this.rows; i++)
-            newMatrix.data[i][0] = this.data[i];
-        return newMatrix;
-    }
-
-    // convert this matrixVector to a vector (format magnitude, angle)
-    toVector() {
-        // throw error if magnitude is 0
-        if (this.magnitude() === 0) throw new Error("Magnitude is 0");
-        // warning if magnitude is 1
-        if (this.magnitude() === 1) console.warn("Magnitude is 1");
-        // warn if the vector is not a 2D vector
-        if (this.rows !== 2) console.warn("Vector is not a 2D vector");
-        let magnitude = this.magnitude();
-        let angle = Math.atan2(this.data[1], this.data[0]);
-        return new Vector(magnitude, angle);
     }
 }
