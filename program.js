@@ -61,16 +61,10 @@ const program = loop((status) => {
         else ui.drawButton("Stop", 10, 10, 100, 40, undefined, undefined, () => program.step(1));
     }, "ui");
     lastStep = steps;
-
+    
     windowView.callOn(foreground => {
         // draw the arm
-        // move to mouse position
-        // take the mouse position and subtract the origo
-        arm.execute("ref", "move", () => [
-            mouse.x - foreground.origo.x,
-            mouse.y - foreground.origo.y
-        ]);
-        arm.execute("p1a1",  "rotate", () => [degToRad( 0.5)]);
+        arm.execute("p1a1", "rotate", () => [degToRad( 0.5)]);
         arm.execute("p1a2", "rotate", () => [degToRad( 0.5)]);
         arm.execute("p2a2", "rotate", () => [degToRad(-0.5)]);
         

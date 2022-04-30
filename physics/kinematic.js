@@ -24,7 +24,7 @@
      * @param {string} name - the name of the vector
      * @param {Vector} vector - the vector
      * @param {string} [parent='ref'] - the name of the parent vector
-     * @returns {Kinematic} - the kinematic
+     * @returns {Kinematic} this
      */
     connect(name, vector, parent = 'ref') {
         if(!(name in this.vectors)) this.vectors[name] = vector;
@@ -37,7 +37,7 @@
     /**
      * Delete a vector from the kinematic
      * @param {string} name - the name of the vector
-     * @returns {Kinematic} - the kinematic
+     * @returns {Kinematic} this
      */
     delete(name) {
         if(name in this.vectors) delete this.vectors[name];
@@ -52,7 +52,7 @@
     /**
      * Disconnect a vector from the kinematic
      * @param {string} name - the name of the vector
-     * @returns {Kinematic|Vector} - the disconnected kinetic or vector
+     * @returns {Kinematic|Vector} Kinematic|Vector
      */
     disconnect(name) {
         // if vector has children, create a new kinematic from name with the children
@@ -83,7 +83,7 @@
     /**
      * Find the parent of a vector
      * @param {string} name - the name of the vector
-     * @returns {string}
+     * @returns {string} string
      */
     findParent(name) {
         for(let parent in this.assignments) if(this.assignments[parent].indexOf(name) !== -1) return parent;
@@ -93,7 +93,7 @@
     /**
      * Get the children of a vector
      * @param {string} name - the name of the vector
-     * @returns {string[]}
+     * @returns {string[]} string[]
      */
     getChildren(name) {
         if(!(name in this.assignments)) return [];
@@ -105,7 +105,7 @@
      * @param {string} name - the name of the vector
      * @param {function} func - the function to execute
      * @param {function(Kinematic, string):[any]} argfunc - the arguments to pass to the function
-     * @returns {Kinematic} - the kinematic
+     * @returns {Kinematic} this
      */
     execute(name, func, argfunc) {
         // ref is allowed, but should skip execution
@@ -125,7 +125,7 @@
      * @param {string} name - the name of the vector
      * @param {function} func - the function to execute
      * @param {function(Kinematic, string):[any]} argfunc - the arguments to pass to the function
-     * @returns {Kinematic} - the kinematic
+     * @returns {Kinematic} this
      */
     reverseExecute(name, func, argfunc) {
         if(name !== "ref") {
@@ -142,7 +142,7 @@
     /**
      * Execute a function on all vectors
      * @param {function} func - the function to execute
-     * @param {function(Kinematic, string):[any]} argfunc - the arguments to pass to the function
+     * @param {function(Kinematic, string):[any]} argfunc - {function(Kinematic, string):[any]}
      */
     executeAll(func, argfunc) {
         for(let name in this.vectors) this.vectors[name][func](...argfunc(this, name));
@@ -154,7 +154,7 @@
      * @recursive
      * @param {string} name - the name of the vector
      * @param {string} [ref='ref'] - the name of the reference
-     * @returns {number}
+     * @returns {number} number
      */
     depth(name, ref='ref') {
         if(!(name in this.vectors)) return 0;
@@ -165,7 +165,7 @@
     /**
      * Find the maximum depth of the kinematic
      * @recursive
-     * @returns {number}
+     * @returns {number} number
      */
     maxDepth() {
         let max = 0;
@@ -176,7 +176,7 @@
     /**
      * Find all vectors of a certain depth
      * @param {number} depth - the depth of the vectors
-     * @returns {Vector[]}
+     * @returns {Vector[]} Vector[]
      */
     getDepth(depth) {
         let vectors = [];
@@ -187,7 +187,7 @@
     /**
      * Find the deepest vectors
      * @description All vectors returned are of the same depth
-     * @returns {Vector[]}
+     * @returns {Vector[]} Vector[]
      */
     getDeepest() {
         let vectors = [];
@@ -198,7 +198,7 @@
     
     /**
      * Get the point of the outermost vectors
-     * @returns {Cordinate[]}
+     * @returns {Cordinate[]} Cordinate[]
      */
     getDeepestPoints() {
         let points = [];
@@ -209,7 +209,7 @@
     /**
      * Get the tips of the kinematic
      * @description The tips are vectors that do not have any children
-     * @returns {Vector[]}
+     * @returns {Vector[]} Vector[]
      */
     getTips() {
         let tips = [];
@@ -219,7 +219,7 @@
     
     /**
      * Get the points of the tips
-     * @returns {Cordinate[]}
+     * @returns {Cordinate[]} Cordinate[]
      */
     getTipsPoint() {
         let points = [];
@@ -230,7 +230,7 @@
     /**
      * Update the kinematic
      * @description The update function is called on all vectors in the kinematic
-     * @returns {Kinematic} - the kinematic
+     * @returns {Kinematic} this
      */
     update() {
         this.execute('ref', 'pathify', (kinetic, name) => [kinetic.vectors[kinetic.findParent(name)]]);
@@ -241,7 +241,7 @@
      * Draw the kinematic
      * @param {Canvas} canvas - the canvas class to draw on
      * @param {string} [color='#0000FFFF'] - the color of the kinematic
-     * @returns {Kinematic} - the kinematic
+     * @returns {Kinematic} this
      */
     draw(canvas, color='#0000FFFF') {
         this.update();
