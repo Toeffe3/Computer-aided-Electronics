@@ -6,10 +6,16 @@
 		<meta name="description" content="">
 		<meta name="author" content="">
 		<title>CAE</title>
+		
+		<link rel="stylesheet" href="visual/main.css">
+		<link rel="stylesheet" href="visual/themes/modern.css">
 
-		<script src="general/functions.js"></script>
+		<script src="functions.js"></script>
 
-		<script src="general/canvas.js"></script>
+		<script src="visual/style.js"></script>
+		<script src="visual/desktop.js"></script>
+		<script src="visual/canvas.js"></script>
+
 		<script src="general/cordinate.js"></script>
 		<script src="general/vector.js"></script>
 		<script src="general/matrix.js"></script>
@@ -18,21 +24,23 @@
 		<script src="physics/kinematic.js"></script>
 		
 		<script src="filters/TFR.js"></script>
-
-		<style>
-			body {
-				margin: 0;
-				padding: 0;
-			}
-			canvas {
-				position: absolute;
-				top: 0;
-				left: 0;
-			}
-		</style>
 	</head>
-	<body>
-		<!-- <h1>Computer Aided Eletronics</h1> -->
+	<body data-theme="dark" data-layout="moderen">
+		<div id="menu" class="panel">
+			<div class="menu item">
+				<h5>New Project</h5>
+			</div>
+			<div class="menu item">
+				<h5>New Canvas</h5>
+			</div>
+			<div class="menu filler"></div>
+			<div class="menu item">
+				<h5>Documentation</h5>
+			</div>
+			<div class="menu item">
+				<h5>About</h5>
+			</div>
+		</div>
 		<script src="program.js" defer></script>
 	</body>
 </html>

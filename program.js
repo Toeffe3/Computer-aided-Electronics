@@ -1,105 +1,127 @@
-// create a mouse object
-const mouse = {
-    x: 0,
-    y: 0,
-    clickedX: 0,
-    clickedY: 0,
-    down: false
+/** @type {windowOptions} */
+const defaultWindowOptions = {
+    width: 400,
+    height: 400,
+    origoX: 0,
+    origoY: 0,
+    zIndex: 1,
+    resizable: true,
+    closeable: true,
+    dragable: true,
+    position: {
+        x: null,
+        y: null
+    }
+}
+
+const styles = {
+    fill: (color) => (new Style())
+        .noStroke()
+        .setFill(color),
+    stroke: (color, width=1) => (new Style())
+        .noFill()
+        .setStroke(color, width),
+    text: (new TextStyle())
+        .setFill("#fff")
+        .setText(16, "consolas", "left"),
+    grid: (new Style())
+        .noFill()
+        .setStroke("#aaa8", 0.75),
+    gridHighlight: (new Style())
+        .noFill()
+        .setStroke("#aaaa", 1.25),
+    axis: (new TextStyle())
+        .setFill("#fffa")
+        .setText(12, "consolas")
+        .setStroke("#fffa", 2),
 };
-// create mouse listeners
-document.onmousemove = (e) => {
-    mouse.x = e.x;
-    mouse.y = e.y;
-};
-document.onmousedown = (e) => {
-    mouse.clickedX = e.x;
-    mouse.clickedY = e.y;
-    mouse.down = true;
-};
-document.onmouseup   = (e) => {
-    mouse.down = false;
-};
+styles.signal = [
+    styles.stroke("#0f8", 2.25),
+    styles.stroke("#f80", 2.25),
+    styles.stroke("#f08", 2.25),
+    styles.stroke("#8f0", 2.25),
+    styles.stroke("#08f", 2.25),
+    styles.stroke("#80f", 2.25),
+];
 
-// create a layered canvas
-const windowView = new Layered();
-windowView.addLayer(new Graph(-1, -1), "background"); // static background
-windowView.addLayer(new Canvas(-1, -1), "foreground"); // updateable foreground
-windowView.addLayer(new Canvas(-1, -1), "ui"); // user interface layer
 
-// set origo to the center of the screen
-windowView.callOn(layers => layers.origo(window.innerWidth/2, window.innerHeight/2), "background", "foreground");
+const lowSampleSignal = Series.sineWave(0.053, 4.4, 0.1, 120, 0).cast("TimeDomain");
+const highSampleSignal = Series.sineWave(0.053, 4.4, 1, 120, 0).cast("TimeDomain");
 
-// Undepended
-const opoint = new Cordinate(0, 0);
-const arm = new Kinematic();
-arm.connect("p1a1", new Vector(100, degToRad(-90)));
-arm.connect("p1a2", new Vector(75, degToRad(-45)), "p1a1");
-arm.connect("p1a3", new Vector(50, degToRad(0)), "p1a2");
 
-arm.connect("p2a1", new Vector(100, degToRad(90)));
-arm.connect("p2a2", new Vector(75, degToRad(135)), "p2a1");
-arm.connect("p2a3", new Vector(50, degToRad(180)), "p2a2");
+const desktop = new Desktop();
 
-arm.execute("ref", "move", () => [40,10]);
+desktop.createWindow("TimeDomain", {...defaultWindowOptions, origoX: 0, origoY: -200, height: 490});
+desktop.createWindow("FreqencyDomain", {...defaultWindowOptions, origoX: -335, origoY: -600, height: 600, width: 670});
+desktop.createWindow("Debug window", {...defaultWindowOptions, height: 80, position: {y: 490, x: 0}});
+desktop.callOn(TimeDomain => {
+    TimeDomain.addLayer(new Graph(), "foreground"); // updateable foreground
+    TimeDomain.addLayer(new Graph(), "background"); // static background
+    TimeDomain.call(layer => {
+        layer.setScale(120/400, 1/35);
+        layer.setUnit("s", "V")
+    });
+}, "TimeDomain");
+desktop.callOn(FreqencyDomain => {
+    FreqencyDomain.addLayer(new Graph(), "foreground"); // updateable foreground
+    FreqencyDomain.addLayer(new Graph(), "background"); // static background
+    FreqencyDomain.call(layer => {
+        layer.setScale(1/10, 1/2);
+        layer.setUnit("Hz", "");
+    });
+}, "FreqencyDomain");
+desktop.callOn(DebugWindow => {
+    DebugWindow.addLayer(new Canvas(), "foreground"); // updateable foreground
+    DebugWindow.addLayer(new Canvas(), "background"); // static background
+}, "Debug window");
 
-// Depended
-const direct = new Vector(0, 0);
-const hand = new Cordinate(0, 0);
+const program = loop(status => {
+    const {frame, fps, target, time, delta, average} = status;
+    const {width, height, windows} = desktop.getInfo();
+    desktop.callOn(TimeDomain =>
+        TimeDomain.callOn(forground => {
+            forground.clear();
+            forground.drawRect(0, 0, forground.canvas.width, forground.canvas.height, styles.fill("black"), "cornor");
+            forground.plot(highSampleSignal, styles.signal[0]);
+            forground.plot(lowSampleSignal, styles.signal[1]);
+        }, "foreground"),
+    "TimeDomain");
 
-// Other
-let lastStep = -2; // step cannot be -2, it will therefor differ first time
+    desktop.callOn(FreqencyDomain =>
+        FreqencyDomain.callOn(forground => {
+            forground.clear();
+            forground.drawRect(0, 0, forground.canvas.width, forground.canvas.height, styles.fill("black"), "cornor");
+            forground.plot(highSampleSignal.fft(), styles.signal[0]);
+            forground.plot(lowSampleSignal.fft(), styles.signal[1]);
+        }, "foreground"),
+    "FreqencyDomain");
 
-// use loop with a framerate
-const program = loop((status) => {
-    const {frame, fps, time, delta, animateId, steps} = status;
-    // update the ui layer
-    // only update the ui layer if the steps has changed
-    if(lastStep != steps) windowView.callOn(ui => {
-        ui.clear();
-        // stop by calling step 1, so that the canvas can update once befor halting (eg. updating text on button)
-        if(steps === 0) ui.drawButton("Start", 10, 10, 100, 40, undefined, undefined, () => program.start());
-        else ui.drawButton("Stop", 10, 10, 100, 40, undefined, undefined, () => program.step(1));
-    }, "ui");
-    lastStep = steps;
-    
-    windowView.callOn(foreground => {
-        // draw the arm
-        arm.execute("p1a1", "rotate", () => [degToRad( 0.5)]);
-        arm.execute("p1a2", "rotate", () => [degToRad( 0.5)]);
-        arm.execute("p2a2", "rotate", () => [degToRad(-0.5)]);
-        
-        foreground.clear();
-        arm.draw(foreground);
-        
-        arm.getDeepestPoints().forEach(point => {
-            foreground.drawPoint(point, "red");
-            direct.point(point)
-            foreground.drawVector(direct, "#00ff00");
-        });
+    desktop.callOn(DebugWindow => 
+        DebugWindow.callOn(forground => {
+            forground.clear();
+            forground.drawText(`runtime: ${Math.floor(time/1000/60)}:${Math.floor(time/1000)%60}:${(time%1000).toString().padStart(3,"0")}`, 0, 10, styles.text);
+            forground.drawText(`delta: ${delta} | frame: ${frame}`, 0, 30, styles.text);
+            forground.drawText(`fps: ${fps} | average: ${average}/${target}`, 0, 50, styles.text);
+            forground.drawText(`open windows: ${windows.length}`, 0, 70, styles.text);
+        },"foreground"),
+    "Debug window");
+}, 30);
 
-    }, "foreground");
-}, 24);
-
-// load the program
-program.step(1);
-program.start();
-
-// the onResize function is called when the window is resized but also when the canvas is loaded
-onResize(() => {
-    // resize of cavas updates the relative position of origo
-    windowView.call(layers => layers.resize());
-    windowView.callOn(background => {
-        background.clear();
-        background.drawGrid(10, 10, "#00000020");
-        background.drawAxis(50, "#00000060", true);
-    }, "background");
-    windowView.callOn(ui => {
-        program.stop();
-        ui.clear();
-        // stop by calling step 1, so that the canvas can update once befor halting (eg. updating text on button)
-        ui.drawButton("Start", 10, 10, 100, 40, undefined, undefined, () => {
-            program.step(-1);
-            program.start();
-        });
-    }, "ui");
+program.onresize(() => {
+    desktop.callOn(TimeDomain => {
+        TimeDomain.callOn(background => {
+            background.clear();
+            background.drawGrid(10, 0.5, styles.grid);
+            background.drawAxis(60, 1, styles.axis, true, styles.gridHighlight);
+        }, "background");
+    }, "TimeDomain");
+    desktop.callOn(FreqencyDomain => {
+        FreqencyDomain.callOn(background => {
+            background.clear();
+            background.drawGrid(5, 25, styles.grid);
+            background.drawAxis(10, 50, styles.axis, true, styles.gridHighlight);
+        },"background");
+    },"FreqencyDomain");
 });
+
+program.start();

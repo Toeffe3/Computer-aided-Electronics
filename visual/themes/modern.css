@@ -1,0 +1,84 @@
+body[data-layout="moderen"] {
+    grid-template-areas: "menu desktop";
+}
+
+body[data-layout="moderen"] #menu {
+    grid-area: menu;
+    display: flex;
+    height: var(--menu-height);
+    width: calc(100vw - 40px);
+    margin-inline: 0;
+    padding-inline: 20px;
+    background-color: #00d68f;
+    font-weight: bold;
+    color: black;
+}
+
+body[data-layout="moderen"] #menu div {
+    height: min-content;
+    justify-self: center;
+}
+
+body[data-layout="moderen"] #menu .item {
+    margin: auto;
+}
+
+body[data-layout="moderen"] #menu .item > * {
+    margin: 0;
+    width: 100px;
+}
+
+body[data-layout="moderen"] #menu .burger {
+    aspect-ratio: 1/1;
+}
+
+body[data-layout="moderen"] #menu .filler {
+    width: 100%;
+    height: 100%;
+    grid-column: span 3;
+}
+
+body[data-layout="moderen"] #desktop {
+    grid-area: desktop;
+    height: calc(100vh - var(--menu-height));
+    width: calc(100vw);
+    margin: 0;
+}
+
+body[data-layout="moderen"] #desktop .window {
+    position: absolute;
+    border: 2px solid midnightblue;
+}
+
+body[data-layout="moderen"] #desktop .window .window-header {
+    margin: 0;
+    background: midnightblue;
+    display: flex;
+    height: 30px;
+}
+
+body[data-layout="moderen"] #desktop .window .window-header h3 {
+    margin: auto auto auto 5px;
+}
+
+body[data-layout="moderen"] #desktop .window .window-header-button {
+    padding: 5px 8px;
+    height: 20px;
+}
+
+body[data-layout="moderen"] #desktop .window .window-header-button-close:hover {
+    background: red;
+}
+
+body[data-layout="moderen"] #desktop .window .window-body {
+    overflow: hidden;
+    width: 100%;
+    height: calc(100% - 30px);
+    position: absolute;
+}
+
+body[data-layout="moderen"] #desktop .window .window-body canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
