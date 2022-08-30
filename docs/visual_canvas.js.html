@@ -1,7 +1,35 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: visual/canvas.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: visual/canvas.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * Create a canvas with functions to better control the canvas
  * @class Canvas
- * @property {HTMLElement<Canvas>} canvas - the canvas element
+ * @property {HTMLElement&lt;Canvas>} canvas - the canvas element
  * @property {CanvasRenderingContext2D} context - the context of the canvas
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API Canvas API on MDN}
  */
@@ -125,12 +153,12 @@ class Canvas {
         
         // draw lines from 0,0 with spacing between each line until the edge of the canvas
         const x = Math.floor(left/spacingX)*spacingX;
-        for(let i=x; i<=right; i+=spacingX) {
+        for(let i=x; i&lt;=right; i+=spacingX) {
             this.context.moveTo(i / scaleX, top);
             this.context.lineTo(i / scaleX, bottom);
         }
         const y = Math.floor(top/spacingY)*spacingY;
-        for(let i=y; i<=bottom; i+=spacingY) {
+        for(let i=y; i&lt;=bottom; i+=spacingY) {
             this.context.moveTo(left, i / scaleY);
             this.context.lineTo(right, i / scaleY);
         }
@@ -161,7 +189,7 @@ class Canvas {
         this.context.moveTo(left, 0);
         this.context.lineTo(right, 0);
         
-        for(let i = 0; i <= right; i+=intervalX / scaleX) {
+        for(let i = 0; i &lt;= right; i+=intervalX / scaleX) {
             this.context.moveTo(i, -5);
             this.context.lineTo(i, 5);
         }
@@ -169,7 +197,7 @@ class Canvas {
             this.context.moveTo(i, -5);
             this.context.lineTo(i, 5);
         }
-        for(let i = 0; i <= bottom; i+=intervalY / scaleY) {
+        for(let i = 0; i &lt;= bottom; i+=intervalY / scaleY) {
             this.context.moveTo(-5, i);
             this.context.lineTo(5, i);
         }
@@ -411,7 +439,7 @@ class Canvas {
         this.context.closePath();
         // Add event listener to the button
         this.canvas().onclick = (e) => {
-            if(e.x > x && e.x < x + width && e.y > y && e.y < y + height) callback();
+            if(e.x > x &amp;&amp; e.x &lt; x + width &amp;&amp; e.y > y &amp;&amp; e.y &lt; y + height) callback();
         };
         return this;
     }
@@ -447,7 +475,7 @@ class Graph extends Canvas {
         if(series instanceof FrequencyDomain) {
             const {frequency, amplitude} = series.getSeries();
             // Stick plot
-            for(let i = 0; i < frequency.length; i++) {
+            for(let i = 0; i &lt; frequency.length; i++) {
                 this.context.beginPath();
                 this.context.moveTo(frequency[i]/scaleX, 0);
                 this.context.lineTo(frequency[i]/scaleX, amplitude[i]/scaleY);
@@ -458,7 +486,7 @@ class Graph extends Canvas {
             const {time, data} = series.getSeries();
             this.context.beginPath();
             this.context.moveTo(time[0]/scaleX, data[0]/scaleY);
-            for(let i = 1; i < time.length; i++) this.context.lineTo(time[i]/scaleX, data[i]/scaleY);
+            for(let i = 1; i &lt; time.length; i++) this.context.lineTo(time[i]/scaleX, data[i]/scaleY);
             this.context.stroke();
         }
         return this;
@@ -476,7 +504,7 @@ class Graph extends Canvas {
         const {x: scaleX, y: scaleY} = this.getAxis();
         this.context.beginPath();
         this.context.moveTo(0, data[0]/scaleY);
-        for(let i = 1; i < data.length; i++) this.context.lineTo(i/scaleX, data[i]/scaleY);
+        for(let i = 1; i &lt; data.length; i++) this.context.lineTo(i/scaleX, data[i]/scaleY);
         this.context.stroke();
         return this;
     }
@@ -500,7 +528,7 @@ class Graph extends Canvas {
             const {x: scaleX, y: scaleY} = this.getAxis();
             
             const x = Math.ceil(Math.min(left, right)/intervalX)*intervalX;
-            for(let i = x; i <= Math.max(left, right); i += intervalX) {
+            for(let i = x; i &lt;= Math.max(left, right); i += intervalX) {
                 if (i === 0) continue; // Don't draw 0
                 this.context.save();
                 this.context.translate(i / scaleX, 0);
@@ -509,7 +537,7 @@ class Graph extends Canvas {
                 this.context.restore();
             }
             const y = Math.ceil(Math.min(top, bottom)/intervalY)*intervalY;
-            for(let i = y; i <= Math.max(top, bottom); i += intervalY) {
+            for(let i = y; i &lt;= Math.max(top, bottom); i += intervalY) {
                 if (i === 0) continue; // Don't draw 0
                 this.context.save();
                 this.context.translate(0, i / scaleY);
@@ -527,7 +555,7 @@ class Graph extends Canvas {
  * Class that holds layers of canvasses or graphs
  * @class Layered
  * @property {windowOptions} options - the options for the window
- * @property {Array<Canvas|Graph>} layers - the layers in the layer
+ * @property {Array&lt;Canvas|Graph>} layers - the layers in the layer
  * @property {HTMLElement} htmlhook - the element to which the layer is attached
  */
 class Layered {
@@ -605,4 +633,26 @@ class Layered {
         return this;
     }
     
-}
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Canvas.html">Canvas</a></li><li><a href="Complex.html">Complex</a></li><li><a href="Coordinate.html">Coordinate</a></li><li><a href="Desktop.html">Desktop</a></li><li><a href="FourierSeries.html">FourierSeries</a></li><li><a href="Graph.html">Graph</a></li><li><a href="ImageStyle.html">ImageStyle</a></li><li><a href="Kinematic.html">Kinematic</a></li><li><a href="Layered.html">Layered</a></li><li><a href="LineStyle.html">LineStyle</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Series.html">Series</a></li><li><a href="Style.html">Style</a></li><li><a href="TextStyle.html">TextStyle</a></li><li><a href="TimeDomain.html">TimeDomain</a></li><li><a href="Vector.html">Vector</a></li></ul><h3>Global</h3><ul><li><a href="global.html#defaultWindowOptions">defaultWindowOptions</a></li><li><a href="global.html#degToRad">degToRad</a></li><li><a href="global.html#FIT">FIT</a></li><li><a href="global.html#getCSSVariable">getCSSVariable</a></li><li><a href="global.html#increment">increment</a></li><li><a href="global.html#incrementGenerator">incrementGenerator</a></li><li><a href="global.html#invertColorString">invertColorString</a></li><li><a href="global.html#listTrackerGenerator">listTrackerGenerator</a></li><li><a href="global.html#loop">loop</a></li><li><a href="global.html#radToDeg">radToDeg</a></li><li><a href="global.html#sum">sum</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Tue Aug 30 2022 17:22:43 GMT+0200 (Centraleuropæisk sommertid)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

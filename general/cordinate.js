@@ -3,7 +3,7 @@
  * @class Coordinate
  * @see {@link https://en.wikipedia.org/wiki/Cartesian_coordinate_system Cartesian coordinate system on Wikipedia}
  */
-class Cordinate {
+class Coordinate {
     /**
      * @constructor
      * @param {number} x - x position

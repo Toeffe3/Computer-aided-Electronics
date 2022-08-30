@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: filters/fourier.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: filters/fourier.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * Fourier series of amplitude and phase
  * @description The fourier series is a series of complex numbers that can be used to represent a function.
  * @see {@link https://en.wikipedia.org/wiki/Fourier_series Fourier series on Wikipedia}
@@ -30,7 +58,7 @@ class FourierSeries {
             this.series.amplitudes.push(amplitude);
             this.series.phases.push(phase);
         } else {
-            while (this.series.amplitudes.length < n) {
+            while (this.series.amplitudes.length &lt; n) {
                 this.series.amplitudes.push(0);
                 this.series.phases.push(0);
             }
@@ -78,7 +106,7 @@ class FourierSeries {
      */
     getFrequency() {
         let freq = [];
-        for (let i = 0; i <= this.length; i++) freq.push(i);
+        for (let i = 0; i &lt;= this.length; i++) freq.push(i);
         return freq;
     }
     
@@ -89,7 +117,7 @@ class FourierSeries {
     getTime() {
         let time = [];
         let step = 1 / this.length;
-        for (let n = 0; n < this.length; n++) time.push(n * step);
+        for (let n = 0; n &lt; this.length; n++) time.push(n * step);
         return time;
     }
     
@@ -99,7 +127,7 @@ class FourierSeries {
      */
     getAmplitude() {
         let amplitude = [];
-        for (let n = 0; n <= this.length; n++) amplitude.push(this.series.amplitudes[n]);
+        for (let n = 0; n &lt;= this.length; n++) amplitude.push(this.series.amplitudes[n]);
         return amplitude;
     }
     /**
@@ -108,7 +136,7 @@ class FourierSeries {
      */
     getPhase() {
         let phase = [];
-        for (let n = 0; n <= this.length; n++) phase.push(this.series.phases[n]);
+        for (let n = 0; n &lt;= this.length; n++) phase.push(this.series.phases[n]);
         return phase;
     }
 
@@ -118,7 +146,7 @@ class FourierSeries {
      */
     getMagnitude() {
         let magnitude = [];
-        for (let n = 0; n <= this.length; n++) magnitude.push(this.series.amplitudes[n] * Math.sqrt(2));
+        for (let n = 0; n &lt;= this.length; n++) magnitude.push(this.series.amplitudes[n] * Math.sqrt(2));
         return magnitude;
     }
     
@@ -128,7 +156,7 @@ class FourierSeries {
      */
     getImaginary() {
         let imaginary = [];
-        for (let n = 0; n <= this.length; n++) imaginary.push(this.series.amplitudes[n] * Math.sin(this.series.phases[n]));
+        for (let n = 0; n &lt;= this.length; n++) imaginary.push(this.series.amplitudes[n] * Math.sin(this.series.phases[n]));
         return imaginary;
     }
     
@@ -138,13 +166,13 @@ class FourierSeries {
      */
     getReal() {
         let real = [];
-        for (let n = 0; n <= this.length; n++) real.push(this.series.amplitudes[n] * Math.cos(this.series.phases[n]));
+        for (let n = 0; n &lt;= this.length; n++) real.push(this.series.amplitudes[n] * Math.cos(this.series.phases[n]));
         return real;
     }
     
     /**
      * Returns a function that represents the fourier series.
-     * @returns {callback<number>}
+     * @returns {callback&lt;number>}
      * @example
      * let f = fourier.toFunction();
      * f(0); // 0
@@ -155,7 +183,7 @@ class FourierSeries {
         let length = this.length;
         return function(x) {
             let sum = series.amplitudes[0]/2;
-            for (let n = 1; n < length; n++) {
+            for (let n = 1; n &lt; length; n++) {
                 sum += series.amplitudes[n] * Math.cos(n * x + series.phases[n]);
             }
             return sum;                       
@@ -164,7 +192,7 @@ class FourierSeries {
 
     /**
      * Converts a function to a fourier series.
-     * @param {callback<number>} f - The function.
+     * @param {callback&lt;number>} f - The function.
      * @param {number} start - The start of the function, default is 0.
      * @param {number} end - The end of the function, default is 1.
      * @param {number} step - The step of the function, default is 0.01.
@@ -174,10 +202,10 @@ class FourierSeries {
         let series = new FourierSeries();
         let length = Math.floor((end - start) / step);
         let x = start;
-        for (let n = 0; n < length; n++) {
+        for (let n = 0; n &lt; length; n++) {
             let amplitude = f(x);
             let phase = 0;
-            for (let m = 1; m <= n; m++) phase += m * Math.sin(m * x);
+            for (let m = 1; m &lt;= n; m++) phase += m * Math.sin(m * x);
             series.setComponent(amplitude, phase, n);
             x += step;
         }
@@ -193,7 +221,7 @@ class FourierSeries {
      * it.reset();
      */
     *[Symbol.iterator]() {
-        for (let n = 0; n < this.length; n++) {
+        for (let n = 0; n &lt; this.length; n++) {
             // return a reset function, and the current components
             yield {
                 component: this.getComponent(n),
@@ -214,10 +242,10 @@ class FourierSeries {
         let series = new FourierSeries();
         let length = Math.min(time.length, frequency.length);
         let x = 0;
-        for (let n = 0; n < length; n++) {
+        for (let n = 0; n &lt; length; n++) {
             let amplitude = frequency[n];
             let phase = 0;
-            for (let m = 1; m <= n; m++) phase += m * Math.sin(m * x);
+            for (let m = 1; m &lt;= n; m++) phase += m * Math.sin(m * x);
             series.setComponent(amplitude, phase, n);
             x += time[n];
         }
@@ -234,9 +262,9 @@ class FourierSeries {
         let series = new FourierSeries();
         let length = Math.min(time.length, amplitude.length);
         let x = 0;
-        for (let n = 0; n < length; n++) {
+        for (let n = 0; n &lt; length; n++) {
             let phase = 0;
-            for (let m = 1; m <= n; m++) phase += m * Math.sin(m * x);
+            for (let m = 1; m &lt;= n; m++) phase += m * Math.sin(m * x);
             series.setComponent(amplitude[n], phase, n);
             x += time[n];
         }
@@ -254,10 +282,10 @@ class FourierSeries {
         let length = audio.length;
         let step = sampleRate / length;
         let x = 0;
-        for (let n = 0; n < length; n++) {
+        for (let n = 0; n &lt; length; n++) {
             let amplitude = audio[n];
             let phase = 0;
-            for (let m = 1; m <= n; m++) phase += m * Math.sin(m * x);
+            for (let m = 1; m &lt;= n; m++) phase += m * Math.sin(m * x);
             series.setComponent(amplitude, phase, n);
             x += step;
         }
@@ -269,7 +297,7 @@ class FourierSeries {
      * @description The plot data is an array of data, one for each argument.
      * @param {...string} axisUnit - The unit types of the axes.
      * @values "frequency", "time", "amplitude", "phase", "magnitude", "imaginary", "real"
-     * @returns {AnyDimensionalArray<number>} AnyDimensionalArray<number>
+     * @returns {AnyDimensionalArray&lt;number>} AnyDimensionalArray&lt;number>
      */
     getPlotData(...axisUnit) {
         let data = [];
@@ -293,7 +321,7 @@ class FourierSeries {
     laplace() {
         let series = new FourierSeries();
         let length = this.length;
-        for (let n = 0; n < length; n++) {
+        for (let n = 0; n &lt; length; n++) {
             let amplitude = this.series.amplitudes[n] / (n + 1);
             let phase = this.series.phases[n] + Math.PI / (n + 1);
             series.setComponent(amplitude, phase, n);
@@ -308,10 +336,10 @@ class FourierSeries {
     DFT() {
         let series = new FourierSeries();
         let length = this.length;
-        for (let n = 0; n < length; n++) {
+        for (let n = 0; n &lt; length; n++) {
             let amplitude = 0;
             let phase = 0;
-            for (let m = 0; m < length; m++) {
+            for (let m = 0; m &lt; length; m++) {
                 amplitude += this.series.amplitudes[m] * Math.cos(m * n * Math.PI / length);
                 phase += this.series.phases[m] * Math.sin(m * n * Math.PI / length);
             }
@@ -330,8 +358,8 @@ class FourierSeries {
         let time = [];
         // zero is the time zero in a sample where zero is not the start of the time series
         // zeroIsIndex is defines if zero is an index else it is an offset
-        if(zeroIsIndex) for (let n = zero; n < array.length; n++) time.push(n);
-        else for (let n = 0; n < array.length; n++) time.push(zero + n);
+        if(zeroIsIndex) for (let n = zero; n &lt; array.length; n++) time.push(n);
+        else for (let n = 0; n &lt; array.length; n++) time.push(zero + n);
         series.length = time.length;
         // match the mathimatical definition of DTFT:
         // X_2pi[omega] = sum(x[n] * e^(i * n * 2pi * omega), n=-infinity, infinity)
@@ -341,3 +369,26 @@ class FourierSeries {
         -Infinity, Infinity, true);
     }
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Canvas.html">Canvas</a></li><li><a href="Complex.html">Complex</a></li><li><a href="Coordinate.html">Coordinate</a></li><li><a href="Desktop.html">Desktop</a></li><li><a href="FourierSeries.html">FourierSeries</a></li><li><a href="Graph.html">Graph</a></li><li><a href="ImageStyle.html">ImageStyle</a></li><li><a href="Kinematic.html">Kinematic</a></li><li><a href="Layered.html">Layered</a></li><li><a href="LineStyle.html">LineStyle</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Series.html">Series</a></li><li><a href="Style.html">Style</a></li><li><a href="TextStyle.html">TextStyle</a></li><li><a href="TimeDomain.html">TimeDomain</a></li><li><a href="Vector.html">Vector</a></li></ul><h3>Global</h3><ul><li><a href="global.html#defaultWindowOptions">defaultWindowOptions</a></li><li><a href="global.html#degToRad">degToRad</a></li><li><a href="global.html#FIT">FIT</a></li><li><a href="global.html#getCSSVariable">getCSSVariable</a></li><li><a href="global.html#increment">increment</a></li><li><a href="global.html#incrementGenerator">incrementGenerator</a></li><li><a href="global.html#invertColorString">invertColorString</a></li><li><a href="global.html#listTrackerGenerator">listTrackerGenerator</a></li><li><a href="global.html#loop">loop</a></li><li><a href="global.html#radToDeg">radToDeg</a></li><li><a href="global.html#sum">sum</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Tue Aug 30 2022 17:22:43 GMT+0200 (Centraleuropæisk sommertid)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
