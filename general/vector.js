@@ -2,10 +2,10 @@
  * Creates a ecluidean vector (magnitude and angle)
  * @description The vector can also be moved in the cartesian plane.
  * @class Vector
- * @extends {Cordinate}
+ * @extends {Coordinate}
  * @see {@link https://en.wikipedia.org/wiki/Euclidean_vector Euclidean vector on Wikipedia}
  */
-class Vector extends Cordinate {
+class Vector extends Coordinate {
     /**
      * Create a new euclidean vector
      * @constructor
@@ -46,8 +46,8 @@ class Vector extends Cordinate {
     }
     
     /**
-     * Get the cordinates this vector points to
-     * @returns {Cordinate} Cordinate
+     * Get the coordinates this vector points to
+     * @returns {Coordinate} Coordinate
      */
     getPoint() {
         return this.size(0).move(
@@ -56,21 +56,21 @@ class Vector extends Cordinate {
     }
 
     /**
-     * Get the cordinate this vector points to
+     * Get the coordinate this vector points to
      * @override
      * @returns {{x, y}} {x, y}
      */
-    getCordinate() {
-        return this.getPoint().getCordinate();
+    getCoordinate() {
+        return this.getPoint().getCoordinate();
     }
     
     /**
      * Point this vector to a point
-     * @param {Cordinate|Vector} to - Point this vector to cordinate or another vector
+     * @param {Coordinate|Vector} to - Point this vector to coordinate or another vector
      * @returns {Vector} this
      */
     point(to) {
-        const {x, y} = to.getCordinate();
+        const {x, y} = to.getCoordinate();
         // calculate new angle
         this.angle = Math.atan2(y - this.y, x - this.x);
         this.angle %= 2 * Math.PI;
@@ -123,9 +123,9 @@ class Vector extends Cordinate {
     }
     
     /**
-     * Set the magnitude of this vector, if the new magnitude is 0 the Cordinate equvilant will be returned and vector unchanged
+     * Set the magnitude of this vector, if the new magnitude is 0 the Coordinate equvilant will be returned and vector unchanged
      * @param {number} magnitude - The magnitude of the vector
-     * @returns {Cordinate|Vector} Cordinate or this
+     * @returns {Coordinate|Vector} Coordinate or this
      */
     size(magnitude) {
         if(magnitude === 0) return super.copy(); // to set size to 0 use scale(0)
@@ -274,8 +274,8 @@ class Vector extends Cordinate {
         return new Vector(this.magnitude, this.angle + Math.PI / 2);
     }
     /**
-     * Get spacial cordinates of this vector
-     * @returns {Cordinate} Coordinates
+     * Get spacial coordinates of this vector
+     * @returns {Coordinate} Coordinates
      */
     spacial() {
         return {
@@ -351,8 +351,8 @@ class Vector extends Cordinate {
      * @returns {Vector} this
      */
     pathify(from) {
-        if(from instanceof Vector) this.cordinate(from.getPoint());
-        else if(from instanceof Cordinate) this.cordinate(from.getCordinate());
+        if(from instanceof Vector) this.coordinate(from.getPoint());
+        else if(from instanceof Coordinate) this.coordinate(from.getCoordinate());
         return this;
     }
 
@@ -360,14 +360,14 @@ class Vector extends Cordinate {
      * Get the point of intersection of this vector and another vector
      * @see https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
      * @param {Vector} vector - The vector to get the intersection of
-     * @returns {Cordinate} Cordinate
+     * @returns {Coordinate} Coordinate
      */
     intersection(vector) {
         const v1 = this.spacial(),
               v2 = vector.spacial(),
               x  = (v2.x2 - v2.x1) / (v1.x2 - v1.x1),
               y  = (v2.y2 - v2.y1) / (v1.y2 - v1.y1);
-        if(x >= 0 && x <= 1 && y >= 0 && y <= 1) return new Cordinate(0,0).move(
+        if(x >= 0 && x <= 1 && y >= 0 && y <= 1) return new Coordinate(0,0).move(
             v1.x1 + x * (v1.x2 - v1.x1),
             v1.y1 + y * (v1.y2 - v1.y1)
         );

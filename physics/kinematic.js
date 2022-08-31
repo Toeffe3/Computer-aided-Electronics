@@ -8,7 +8,7 @@
      * @returns {Kinematic} this
      */
     constructor() {
-        this.ref = new Cordinate(0, 0);
+        this.ref = new Coordinate(0, 0);
         // an object will be created to store all vectors with a name
         this.vectors = {};
         // store how the vectors are connected
@@ -198,7 +198,7 @@
     
     /**
      * Get the point of the outermost vectors
-     * @returns {Cordinate[]} Cordinate[]
+     * @returns {Coordinate[]} Coordinate[]
      */
     getDeepestPoints() {
         let points = [];
@@ -219,7 +219,7 @@
     
     /**
      * Get the points of the tips
-     * @returns {Cordinate[]} Cordinate[]
+     * @returns {Coordinate[]} Coordinate[]
      */
     getTipsPoint() {
         let points = [];

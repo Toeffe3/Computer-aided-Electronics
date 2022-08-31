@@ -311,20 +311,20 @@ class Canvas {
 
     /**
      * Draws a point on the canvas
-     * @param  {Cordinate} point - the point to be translated
+     * @param  {Coordinate} point - the point to be translated
      * @param  {Style} style - the style
      * @returns {Canvas} this
      */
     drawPoint(point, style, ref = "origo") {
-        if(!point instanceof Cordinate) return new Error("point is not of proper type");
+        if(!point instanceof Coordinate) return new Error("point is not of proper type");
         ref = this.reference(ref);
         style.apply(this.context);
-        if(point instanceof Vector) { // Vector should be checked before Cordinate, because vector is extended from Cordinate
+        if(point instanceof Vector) { // Vector should be checked before Coordinate, because vector is extended from Coordinate
             const {x1, y1, x2, y2} = point.spacial();
             this.drawCircle(x1, y1, 3, color);
             this.drawCircle(x2, y2, 3, color);
-        } else if (point instanceof Cordinate) {
-            const {x, y} = point.getCordinate()
+        } else if (point instanceof Coordinate) {
+            const {x, y} = point.getCoordinate()
             this.drawCircle(x, y, 3, color);
         }
         this.reference(ref);

@@ -1,5 +1,5 @@
 /**
- * Create a cordinate point
+ * Create a coordinate point
  * @class Coordinate
  * @see {@link https://en.wikipedia.org/wiki/Cartesian_coordinate_system Cartesian coordinate system on Wikipedia}
  */
@@ -8,7 +8,7 @@ class Coordinate {
      * @constructor
      * @param {number} x - x position
      * @param {number} y - y position
-     * @return {Cordinate} this
+     * @return {Coordinate} this
      */
     constructor(x, y) {
         this.x = x;
@@ -33,15 +33,15 @@ class Coordinate {
     }
 
     /**
-     * Get the cordinate as an object
+     * Get the coordinate as an object
      * @returns {{x, y}} {x, y}
      */
-    getCordinate() {
+    getCoordinate() {
         return { x: this.x, y: this.y };
     }
 
     /**
-     * Get the cordinate as a string
+     * Get the coordinate as a string
      * @override
      * @returns {string} string
      */
@@ -50,8 +50,8 @@ class Coordinate {
     }
 
     /**
-     * Get the distance between this cordinate and another
-     * @param {Cordinate} cord - cordinate to calculate distance to
+     * Get the distance between this coordinate and another
+     * @param {Coordinate} cord - coordinate to calculate distance to
      * @return {number} number
      */
     distance(cord) {
@@ -62,8 +62,8 @@ class Coordinate {
     }
 
     /**
-     * Get the angle between this cordinate and another
-     * @param {Cordinate} cord - cordinate to calculate angle to
+     * Get the angle between this coordinate and another
+     * @param {Coordinate} cord - coordinate to calculate angle to
      * @return {number} number
      */
     angle(cord) {
@@ -71,21 +71,21 @@ class Coordinate {
     }
 
     /**
-     * Move this cordinate to another
-     * @param {Cordinate} cord - cordinate to move to
-     * @return {Cordinate} this
+     * Move this coordinate to another
+     * @param {Coordinate} cord - coordinate to move to
+     * @return {Coordinate} this
      */
-    cordinate(cord) {
+    coordinate(cord) {
         this.x = cord.x;
         this.y = cord.y;
         return this;
     }
     
     /**
-     * Move this cordinate to another
+     * Move this coordinate to another
      * @param {number} x - x position
      * @param {number} y - y position
-     * @return {Cordinate} this
+     * @return {Coordinate} this
      */
     move(x, y) {
         this.x = x;
@@ -95,7 +95,7 @@ class Coordinate {
     
     /**
      * Set the point back to the origin
-     * @returns {Cordinate} this
+     * @returns {Coordinate} this
      */
     origin() {
         this.x = 0;
@@ -104,10 +104,10 @@ class Coordinate {
     }
     
     /**
-     * Get a new cordinate that is a copy of this one
-     * @return {Cordinate} Cordinate
+     * Get a new coordinate that is a copy of this one
+     * @return {Coordinate} Coordinate
      */
     copy() {
-        return new Cordinate(this.x, this.y);
+        return new Coordinate(this.x, this.y);
     }
 }
