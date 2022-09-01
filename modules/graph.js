@@ -1,16 +1,19 @@
+import {increment} from './functions.js';
+import { FrequencyDomain } from './maths/series.js';
+
 /**
- * Create a canvas with functions to better control the canvas
- * @class Canvas
- * @property {HTMLElement<Canvas>} canvas - the canvas element
+ * Create a Graph with functions to better control the canvas
+ * @class Graph
+ * @property {HTMLElement<Graph>} canvas - the canvas element
  * @property {CanvasRenderingContext2D} context - the context of the canvas
- * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API Canvas API on MDN}
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API Graph API on MDN}
  */
-class Canvas {
+ export default class Graph {
     /**
      * Creates a canvas element with a given size
      * @param  {number} width - negative number are summed to the width of the window
      * @param  {number} height - negative number are summed to the height of the window
-     * @returns {Canvas} the canvas element
+     * @returns {Graph} Graph   
      */
     constructor() {
         this.canvas = document.createElement('CANVAS');
@@ -43,7 +46,7 @@ class Canvas {
      * @param {number} [height=window.innerHeight] - the height of the canvas
      * @param {number} [origoX=0] - the x coordinate of the origo
      * @param {number} [origoY=0] - the y coordinate of the origo
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     update(width=window.innerWidth, height=window.innerHeight, origoX=0, origoY=0) {
         this.canvas = document.getElementById(`${this.canvas.id}`);
@@ -59,7 +62,7 @@ class Canvas {
      * Scale the canvas
      * @param  {number} x - the amount of canvas-pixels per screen-pixels for the x-axis
      * @param  {number} y - the amount of canvas-pixels per screen-pixels for the y-axis
-     * @returns {Canvas} this
+     * @returns {Graph} this
      * @example canvas.scale(2/1, 2/1); // 'Zoom in' by 50%
      * @example canvas.scale(1/2, 1/2); // 'Zoom out' by 50%
      * @example canvas.scale(-1, -1); // Inverse x and y axis
@@ -74,7 +77,7 @@ class Canvas {
      * Set the unit of the axis
      * @param {string?} x - the unit of the x-axis
      * @param {string?} y - the unit of the y-axis
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     setUnit(x, y) {
         this.axis.x.unit = x??"";
@@ -112,7 +115,7 @@ class Canvas {
      * @param  {number} spacingX - the interval between the lines in the x axis
      * @param  {number} spacingY - the interval between the lines in the y axis
      * @param  {Style} style - the style
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     drawGrid(spacingX, spacingY, style) {
         const ref = this.reference("origo");
@@ -134,50 +137,6 @@ class Canvas {
             this.context.moveTo(left, i / scaleY);
             this.context.lineTo(right, i / scaleY);
         }
-
-        this.context.stroke();
-        this.reference(ref);
-        return this;
-    }
-    
-    /**
-     * Draw axis with ticks and numbers
-     * @param  {number} intervalX - the interval between the ticks in the x axis
-     * @param  {number} intervalY - the interval between the ticks in the y axis
-     * @param  {Style} style - the style
-     * @param  {Style?} gridStyle - if defined, a grid will be drawn with same interval as the ticks
-     * @returns {Canvas} this
-     */
-    drawAxis(intervalX, intervalY, style, gridStyle) {
-        const ref = this.reference("origo");
-        if(gridStyle) this.drawGrid(intervalX, intervalY, gridStyle);
-        style.apply(this.context);
-        const {left, right, top, bottom} = this.getLimits(false);
-        const {x: scaleX, y: scaleY} = this.getAxis(true);
-
-        this.context.beginPath();
-        this.context.moveTo(0, top);
-        this.context.lineTo(0, bottom);
-        this.context.moveTo(left, 0);
-        this.context.lineTo(right, 0);
-        
-        for(let i = 0; i <= right; i+=intervalX / scaleX) {
-            this.context.moveTo(i, -5);
-            this.context.lineTo(i, 5);
-        }
-        for(let i = 0; i >= left; i-=intervalX / scaleX) {
-            this.context.moveTo(i, -5);
-            this.context.lineTo(i, 5);
-        }
-        for(let i = 0; i <= bottom; i+=intervalY / scaleY) {
-            this.context.moveTo(-5, i);
-            this.context.lineTo(5, i);
-        }
-        for(let i = 0; i >= top; i-=intervalY / scaleY) {
-            this.context.moveTo(-5, i);
-            this.context.lineTo(5, i);
-        }
-
 
         this.context.stroke();
         this.reference(ref);
@@ -228,7 +187,7 @@ class Canvas {
      * @param  {number} height - the height of the rectangle
      * @param  {Style} style - the style
      * @param {"origo"|"center"|"cornor"} ref - the reference point
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     drawRect(x, y, width, height, style, ref = "origo") {
         ref = this.reference(ref);
@@ -246,7 +205,7 @@ class Canvas {
      * @param  {number} radius - the radius of the circle
      * @param  {Style} style - the style
      * @param {"origo"|"center"|"cornor"} ref - the reference point
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     drawCircle(x, y, radius, style, ref = "origo") {
         ref = this.reference(ref);
@@ -267,7 +226,7 @@ class Canvas {
      * @param {number} y2 - the y coordinate of the second point
      * @param  {Style} style - the style
      * @param {"origo"|"center"|"cornor"} ref - the reference point
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     drawLine(x1, y1, x2, y2, style, ref = "origo") {
         ref = this.reference(ref);
@@ -288,7 +247,7 @@ class Canvas {
      * @param  {number} y - the y coordinate of the top left corner of the text
      * @param  {Style} style - the style
      * @param {"origo"|"center"|"cornor"} ref - the reference point
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     drawText(text, x, y, style, ref = "origo") {
         ref = this.reference(ref);
@@ -300,7 +259,7 @@ class Canvas {
     
     /**
      * Clears the canvas
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     clear() {
         const ref = this.reference("cornor");
@@ -313,7 +272,7 @@ class Canvas {
      * Draws a point on the canvas
      * @param  {Coordinate} point - the point to be translated
      * @param  {Style} style - the style
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     drawPoint(point, style, ref = "origo") {
         if(!point instanceof Coordinate) return new Error("point is not of proper type");
@@ -335,7 +294,7 @@ class Canvas {
      * @param {Vector} vector - the vector to be drawn 
      * @param {Style} style - the style
      * @param {"origo"|"center"|"cornor"} ref - the reference point
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     drawVector(vector, style, ref = "origo") {
         if(!(vector instanceof Vector)) return new Error("vector is not of proper type");
@@ -350,7 +309,7 @@ class Canvas {
      * Sets the origo of the canvas to a given screen position
      * @param {number} x - the x coordinate of the new origo
      * @param {number} y - the y coordinate of the new origo
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     origo(x, y) {
         const ref = this.reference("cornor");
@@ -364,7 +323,7 @@ class Canvas {
      * Resizes the canvas to a given width and height
      * @param {number} width - the new width of the canvas
      * @param {number} height - the new height of the canvas
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     resize(width=window.innerWidth, height=window.innerHeight, keepOrigo = false) {
         // calculate the postion percentage of old origo and apply
@@ -394,7 +353,7 @@ class Canvas {
      * @param {Style} buttonstyle - the style
      * @param {StyleText} textstyle - the style
      * @param {function} callback - the function to be called when the button is clicked
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     drawButton(text, x, y, width, height, buttonstyle, textstyle, callback = () => {}) {
         // rect with round corners
@@ -415,32 +374,15 @@ class Canvas {
         };
         return this;
     }
-}
-
-/**
- * Class that extends Canvas but intended to draw graphs (like ossilisocpe)
- * @extends Canvas
- * @class Graph
- */
-class Graph extends Canvas {
-    /**
-     * Creates a new graph
-     * @param {number} width - the width of the graph
-     * @param {number} height - the height of the graph
-     * @returns {Graph} this
-     */
-    constructor(width, height) {
-        super(width, height);
-        return this;
-    }
     
     /**
      * Draws a graph (plotting)
      * @param {Series} series - the series to be plotted
      * @param {Style} style - the style
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     plot(series, style) {
+        const ref = this.reference("origo");
         const {x: scaleX, y: scaleY} = this.getAxis();
         style.apply(this.context);
 
@@ -461,6 +403,7 @@ class Graph extends Canvas {
             for(let i = 1; i < time.length; i++) this.context.lineTo(time[i]/scaleX, data[i]/scaleY);
             this.context.stroke();
         }
+        this.reference(ref);
         return this;
     }
 
@@ -469,7 +412,7 @@ class Graph extends Canvas {
      * @param {number[]} data - the array of numbers to be plotted
      * @param {Style} style - the style
      * @param {{x: number, y: number}} [scale] - the scale of the graph
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     plotArray(data, style) {
         style.apply(this.context);
@@ -489,13 +432,54 @@ class Graph extends Canvas {
      * @param {Style} style - the style
      * @param {boolean} [numbering=true] - if true the marks will be numbered
      * @param {Style?} [gridStyle] - if given the grid will be drawn
-     * @returns {Canvas} this
+     * @returns {Graph} this
      */
     drawAxis(intervalX, intervalY, style, numbering = false, gridStyle = null) {
-        super.drawAxis(intervalX, intervalY, style, gridStyle);
+        const ref = this.reference("origo");
+        if(gridStyle) this.drawGrid(intervalX, intervalY, gridStyle);
+        style.apply(this.context);
+        const {left, right, top, bottom} = this.getLimits(false);
+        const {x: scaleX, y: scaleY} = this.getAxis(true);
+        // determine the offset of the axis
+        let x, y;
+        switch(intervalX) {
+            case "left": x = left; break;
+            case "right": x = right; break;
+            case "center": x = 0; break;
+            default: x = intervalX * scaleX;
+        }
+        switch(intervalY) {
+            case "top": y = top; break;
+            case "bottom": y = bottom; break;
+            case "center": y = 0; break;
+            default: y = intervalY * scaleY;
+        }
+        this.context.beginPath();
+        this.context.moveTo(x, top);
+        this.context.lineTo(x, bottom);
+        this.context.moveTo(left, y);
+        this.context.lineTo(right, y);
+        
+        for(let i = 0; i <= right; i+=intervalX / scaleX) {
+            this.context.moveTo(i, y-5);
+            this.context.lineTo(i, y+5);
+        }
+        for(let i = 0; i >= left; i-=intervalX / scaleX) {
+            this.context.moveTo(i, y-5);
+            this.context.lineTo(i, y-5);
+        }
+        for(let i = 0; i <= bottom; i+=intervalY / scaleY) {
+            this.context.moveTo(x-5, i);
+            this.context.lineTo(x+5, i);
+        }
+        for(let i = 0; i >= top; i-=intervalY / scaleY) {
+            this.context.moveTo(x-5, i);
+            this.context.lineTo(x+5, i);
+        }
+
+        this.context.stroke();
 
         if(numbering) {
-            const ref = super.reference("origo");
             const {left, right, top, bottom} = this.getLimits();
             const {x: scaleX, y: scaleY} = this.getAxis();
             
@@ -517,92 +501,48 @@ class Graph extends Canvas {
                 this.context.fillText(`${i}${this.axis.y.unit}`, 10, 0);
                 this.context.restore();
             }
-            super.reference(ref);
+            this.reference(ref);
         }
         return this;
     }
+
+    /**
+     * Offset/move the viewport of the canvas to uncover hidden parts
+     * @param {number} x - the x offset,
+     * @param {number} y - the y offset
+     * @param {boolean} [absolute=false] - if true offset will be in true pixels, not in the scale of the axis
+     * @returns {Graph} this
+     */
+    offsetViewport(x, y, absolute = false) {
+        const ref = this.reference("cornor");
+        const {x: scaleX, y: scaleY} = absolute ? {x: 1, y: 1} : this.getAxis();
+        // Update origo to move the viewport
+        // get the current reference and move it
+        this.origoX += x / scaleX;
+        this.origoY += y / scaleY;
+        
+        this.reference(ref);
+        return this;
+    }
+
+    /**
+     * Set the viewport of the canvas to uncover hidden parts
+     * @param {number?} x - the x offset, if null the current value will be used
+     * @param {number?} y - the y offset, if null the current value will be used
+     * @param {boolean} [absolute=false] - if true offset will be in true pixels, not in the scale of the axis
+     * @returns {Graph} this
+     */
+    setViewport(x, y, absolute = false) {
+        const ref = this.reference("cornor");
+        const {x: scaleX, y: scaleY} = absolute ? {x: 1, y: 1} : this.getAxis();
+        // Update origo to move the viewport
+        // get the current reference and move it
+        if(x !== null) this.origoX = x / scaleX;
+        if(y !== null) this.origoY = y / scaleY;
+
+        this.reference(ref);
+        return this;
+    }
+
 }
 
-/**
- * Class that holds layers of canvasses or graphs
- * @class Layered
- * @property {windowOptions} options - the options for the window
- * @property {Array<Canvas|Graph>} layers - the layers in the layer
- * @property {HTMLElement} htmlhook - the element to which the layer is attached
- */
-class Layered {
-    /**
-     * Creates a new layered object
-     * @param {HTMLElement} htmlhook - the html element to attach the canvas to
-     * @param {windowOptions} options - the options for the window
-     * @returns {Layered} this
-     */
-    constructor(htmlhook, options = {}) {
-        this.layers = {};
-        /** @type {windowOptions} */
-        this.options = options;
-        this.htmlhook = htmlhook;
-        return this;
-    }
-
-    /**
-     * Adds a layer to the layers array
-     * @description Layers are drawn in the order they are added (last added is on top)
-     * @param {Canvas} layer - the layer to be added
-     * @param {string} name - the name of the layer
-     * @param {HTMLElement?} appendTo - the html element to append the layer to, default is the body
-     * @returns {Layered} this
-     */
-    addLayer(layer, name, appendTo = this.htmlhook) {
-        this.layers[name] = layer;
-        appendTo.appendChild(layer.canvas);
-        layer.update(this.options.width, this.options.height, this.options.origoX, this.options.origoY);
-        layer.canvas.id = `${name}-canvas`;
-        layer.canvas.classList.add("layer");
-        return this;
-    }
-    
-    /**
-     * Get all the layers
-     * @returns {Layered[]} the layers array
-     */
-    getLayers() {
-        return Object.values(this.layers);
-    }
-    
-    /**
-     * Get all layers in an array
-     * @returns {string[]} an array of all layers
-     */
-    getLayerNames() {
-        return Object.keys(this.layers);
-    }
-
-    /**
-     * Call a function on all layers
-     * @param {layerCallback} func - the function to be called
-     * @returns {Layered} this
-     */
-    call(func) {
-        const layers = this.layers;
-        this.getLayerNames().forEach(name => 
-            func(layers[name])
-        );
-        return this;
-    }
-    
-    /**
-     * Call function on all specified layers (names)
-     * @param {layerCallback} func - the function to be called
-     * @param {string[]} names - the names of the layers to be called
-     * @returns {Layered} this
-     */
-    callOn(func, ...names) {
-        if(typeof func != "function") return new Error(`${func} is not a function`);
-        names.forEach(name => {
-            if(this.layers[name]) func(this.layers[name]);
-        });
-        return this;
-    }
-    
-}

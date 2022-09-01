@@ -1,0 +1,20 @@
+{
+  "name": "computeraidedeletronics",
+  "version": "1.0.0",
+  "description": "Handy tool for eletronic engineers",
+  "main": "program.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "start": "ws --cors.origin * -c"
+  },
+  "author": "Toeffe3",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.23.0"
+  },
+  "dependencies": {
+    "local-web-server": "^5.2.1"
+  }
+}

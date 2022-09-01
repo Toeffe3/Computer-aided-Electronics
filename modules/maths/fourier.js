@@ -4,7 +4,7 @@
  * @see {@link https://en.wikipedia.org/wiki/Fourier_series Fourier series on Wikipedia}
  * @class FourierSeries
  */
-class FourierSeries {
+export default class FourierSeries {
     /**
      * Creates a new fourier series.
      * @constructor

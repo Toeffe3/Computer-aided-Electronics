@@ -4,11 +4,12 @@
  * @property {StyleFill} [fill]
  * @property {StyleStroke} [stroke]
  * @property {StyleShadow} [shadow]
+ * @property {StyleText} [text]
  * @property {gradientList} [gradientList]
  * @property {number} [globalAlpha=1]
  * @property {"source-over"|"source-in"|"source-out"|"source-atop"|"destination-over"|"destination-in"|"destination-out"|"destination-atop"|"lighter"|"copy"|"xor"} [globalCompositeOperation="source-over"]
  */
- class Style {
+ export default class Style {
     /**
      * Creates a new style object
      * @returns {Style} this
@@ -29,6 +30,22 @@
             offsetX: 0,
             offsetY: 0
         };
+        this.text = {
+            /** @type {number} */
+            size: 10,
+            /** @type {string} */
+            family: "Arial",
+            /** @type {"center"|"left"|"right"} */
+            align: "center",
+            /** @type {"middle"|"top"|"bottom"} */
+            baseline: "middle",
+            /** @type {"left"|"right"|"inherit"} */
+            direction: "inherit",
+            /** @type {"normal"|"italic"|"oblique"} */
+            style: "normal",
+            /** @type {"normal"|"bold"|"bolder"|"lighter"|"100"|"200"|"300"|"400"|"500"|"600"|"700"|"800"|"900"} */
+            weight: "normal",
+        }
         /** @type {gradientList} */
         this.gradients = {
         }
@@ -179,74 +196,11 @@
         ctx.shadowOffsetY = this.shadow.offsetY;
         ctx.globalAlpha = this.globalAlpha;
         ctx.globalCompositeOperation = this.globalCompositeOperation;
+        ctx.font = this.text.size + "px " + this.text.family;
+        ctx.textAlign = this.text.align;
+        ctx.textBaseline = this.text.baseline;
+        ctx.direction = this.text.direction;
         return ctx;
-    }
-
-    /**
-     * Import a style from a JSON object
-     * @static
-     * @param {string} json - the JSON object
-     * @returns {Style} the style
-     */
-    static import(json) {
-        /** @type {StyleProperties} */
-        const obj = JSON.parse(json);
-        let style = new Style();
-        style.fill = obj.fill
-        style.stroke = obj.stroke;
-        style.shadow = obj.shadow;
-        style.globalAlpha = obj.globalAlpha;
-        style.globalCompositeOperation = obj.globalCompositeOperation;
-        return style;
-    }
-
-    /**
-     * Export the style to a JSON object
-     * @static
-     * @param {Style} style - the style to export
-     * @returns {string} the JSON object
-     */
-    static export(style) {
-        return JSON.stringify({
-            fill: style.fill,
-            stroke: style.stroke,
-            shadow: style.shadow,
-            globalAlpha: style.globalAlpha,
-            globalCompositeOperation: style.globalCompositeOperation
-        });
-    }
-}
-
-/**
- * Text style
- * @class TextStyle
- * @extends Style
- */
-class TextStyle extends Style {
-    /**
-     * Creates a new text style object
-     * @returns {TextStyle} this
-     */
-    constructor() {
-        super();
-        /** @type {StyleText} */
-        this.text = {
-            /** @type {number} */
-            size: 10,
-            /** @type {string} */
-            family: "Arial",
-            /** @type {"center"|"left"|"right"} */
-            align: "center",
-            /** @type {"middle"|"top"|"bottom"} */
-            baseline: "middle",
-            /** @type {"left"|"right"|"inherit"} */
-            direction: "inherit",
-            /** @type {"normal"|"italic"|"oblique"} */
-            style: "normal",
-            /** @type {"normal"|"bold"|"bolder"|"lighter"|"100"|"200"|"300"|"400"|"500"|"600"|"700"|"800"|"900"} */
-            weight: "normal",
-        }
-        return this;
     }
 
     /**
@@ -265,21 +219,6 @@ class TextStyle extends Style {
         this.text.baseline = baseline;
         this.text.direction = direction;
         return this;
-    }
-
-    /**
-     * Apply the style to the context
-     * @override
-     * @param {CanvasRenderingContext2D} ctx - the context to apply the style to
-     * @returns {CanvasRenderingContext2D} the context
-     */
-    apply(ctx) {
-        ctx = super.apply(ctx);
-        ctx.font = this.text.size + "px " + this.text.family;
-        ctx.textAlign = this.text.align;
-        ctx.textBaseline = this.text.baseline;
-        ctx.direction = this.text.direction;
-        return ctx;
     }
 }
 
@@ -463,4 +402,3 @@ class LineStyle extends Style {
         return ctx;
     }
 }
-

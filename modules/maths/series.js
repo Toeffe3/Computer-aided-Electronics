@@ -1,8 +1,9 @@
+import Complex from './complex.js';
 /**
  * Series are mathimatical collection of arrays
  * @class Series
  */
-class Series {
+export default class Series {
     /**
      * @constructor
      * @param {string} name - name of series
@@ -230,7 +231,7 @@ class Series {
  * @class
  * @extends Series
  */
-class TimeDomain extends Series {
+export class TimeDomain extends Series {
     constructor(sampleRate, data) {
         if (sampleRate instanceof Series) {
             data = sampleRate.data;
@@ -286,7 +287,11 @@ class TimeDomain extends Series {
 
 }
 
-class FrequencyDomain extends Series {
+/**
+ * @class
+ * @extends Series
+ */
+export class FrequencyDomain extends Series {
     constructor(sampleRate, signal) {
         super("frequencySeries", sampleRate, signal);
     }

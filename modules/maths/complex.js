@@ -3,7 +3,7 @@
  * @class Complex
  * @see {@link https://en.wikipedia.org/wiki/Complex_number Complex number on Wikipedia}
  */
-class Complex {
+export default class Complex {
     /**
      * Creates a new complex number.
      * @constructor

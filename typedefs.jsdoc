@@ -1,4 +1,18 @@
 /**
+ * Import all files
+ * @typedef {import('./modules/maths/complex')} Types_Complex
+ * @typedef {import('./modules/maths/coordinate')} Types_Coordinate
+ * @typedef {import('./modules/maths/matrix')} Types_Matrix
+ * @typedef {import('./modules/maths/vector')} Types_Vector
+ * @typedef {import('./modules/maths/series')} Types_Series
+ * @typedef {import('./modules/maths/fourier')} Types_Fourier
+ * @typedef {import('./modules/graph')} Types_Graph
+ * @typedef {import('./modules/layer')} Types_Layer
+ * @typedef {import('./modules/desktop')} Types_Desktop
+ * @typedef {import('./modules/styles')} Types_Styles
+ */
+
+/**
  * options for window
  * @typedef {Object} windowOptions
  * @property {number} width
@@ -117,13 +131,13 @@
  * @template T
  * @callback dynamicAgrumentCallback
  * @param {T} this - the object that the function is called on
- * @param {string} name - name of the subobject beeing called 
+ * @param {string} name - name of the subobject beeing called
  * @returns {Array} List of values to be passed to the function
  */
 
 /**
  * @callback layerCallback
- * @param {Canvas|Graph} arg0 - the canvas or graph object
+ * @param {Graph|Graph} arg0 - the canvas or graph object
  * @returns {void}
  */
 
@@ -137,14 +151,14 @@
  * @property {number} delta - The current delta
  * @property {number} animateId - The current animateId
  * @property {number} steps - The current steps
- * @property {{status: boolean, time: number, frames: number}} lazy - Data from when tab is inactive
+ * @property {boolean} lazy - If tab is not active
  */
 
 /**
  * @typedef {Object} loopReturn
- * @property {callback<number, loopStatus>} step - The step function
- * @property {callbackReturn<loopStatus>} start - The start function
- * @property {callbackReturn<loopStatus>} stop - The stop function
+ * @property {callback<number>} step - The step function
+ * @property {callback<void>} start - The start function
+ * @property {callback<void>} stop - The stop function
  * @property {callbackReturn<loopStatus>} status - The status function
  * @property {callback<void>} onresize - The onresize function
  */

@@ -3,7 +3,7 @@
  * @see {@link https://en.wikipedia.org/wiki/Matrix_%28mathematics%29 Matrix on Wikipedia}
  * @class Matrix
  */
-class Matrix {
+export default class Matrix {
     /**
      * Create a matrix with a finite number of rows and columns.
      * @constructor

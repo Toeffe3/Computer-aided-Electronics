@@ -2,7 +2,7 @@
  * Create a collection of vectors depedant on each other
  * @class Kinematic
  */
- class Kinematic {
+ export default class Kinematic {
     /**
      * Creates a new collection of vectors
      * @returns {Kinematic} this
@@ -239,7 +239,7 @@
     
     /**
      * Draw the kinematic
-     * @param {Canvas} canvas - the canvas class to draw on
+     * @param {Graph} canvas - the canvas class to draw on
      * @param {string} [color='#0000FFFF'] - the color of the kinematic
      * @returns {Kinematic} this
      */

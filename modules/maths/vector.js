@@ -5,7 +5,7 @@
  * @extends {Coordinate}
  * @see {@link https://en.wikipedia.org/wiki/Euclidean_vector Euclidean vector on Wikipedia}
  */
-class Vector extends Coordinate {
+export default class Vector extends Coordinate {
     /**
      * Create a new euclidean vector
      * @constructor

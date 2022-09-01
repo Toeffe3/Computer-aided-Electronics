@@ -1,8 +1,11 @@
+import {listTrackerGenerator} from './functions.js';
+import Layered from './layer.js';
+
 /**
  * Creates a window organizer
  * @class Desktop
  */
-class Desktop {
+ export default class Desktop {
     /**
      * Create a desktop
      * @property {Object<string, Layered>} windows - windows
@@ -31,9 +34,11 @@ class Desktop {
      */
     updateListeners(name) {
         const w = document.querySelector(`#${this.windows[name].htmlhook.parentElement.id}`);
+        const resizeButton = w.querySelector(".window-header-button-resize");
+        const dragButton = w.querySelector(".window-header-button-drag");
+        const closeButton = w.querySelector(".window-header-button-close");
 
-        // Resize button
-        w.querySelector(`.window-header-button-resize`).onmousedown = (e) => {
+        if(resizeButton) resizeButton.onmousedown = (e) => {
             e.preventDefault();
             const startX = e.clientX;
             const startY = e.clientY;
@@ -55,8 +60,7 @@ class Desktop {
             }
         };
 
-        // Drag button
-        w.querySelector(`.window-header-button-drag`).onmousedown = (e) => {;
+        if(dragButton) dragButton.onmousedown = (e) => {;
             e.preventDefault();
             const startX = e.clientX - w.offsetLeft;
             const startY = e.clientY - w.offsetTop;
@@ -73,8 +77,7 @@ class Desktop {
             };
         };
 
-        // Close button
-        w.querySelector(`.window-header-button-close`).onclick = () => this.removeWindow(name);
+        if(closeButton) closeButton.onclick = () => this.removeWindow(name);
     }
 
     /**
