@@ -1,4 +1,8 @@
 /**
+ * @typedef {'import(typedefs.js)'} _Typedefs
+ */
+
+/**
  * Global functions
  * @description Global functions that are used by end users or multiple modules
  * @module functions
@@ -18,7 +22,7 @@ export const defaultWindowOptions = {
 		x: null,
 		y: null
 	}
-}
+};
 
 /**
  * A function that executes a callback continuously using requestAnimationFrame
@@ -37,14 +41,14 @@ export function loop(callback) {
 			cancelAnimationFrame(animateId);
 			steps = -1;
 		} else {
-			fps = (1000/Math.floor(now - time)).toFixed(2);
+			fps = (1000 / Math.floor(now - time)).toFixed(2);
 			time = performance.now();
 			frame++;
 			callback({ frame, fps, time, animateId, steps });
 			if (steps > 0) steps--;
 			animateId = requestAnimationFrame(animate);
 		}
-	}
+	};
 
 	return {
 		start: () => animate(),
@@ -72,7 +76,7 @@ export function loop(callback) {
  * @param {number} [start=0] - The starting number
  * @param {number} [step=1] - The step size
  */
- function* incrementGenerator(start = 0, padding = 4) {
+function* incrementGenerator(start = 0, padding = 4) {
 	while (true) yield `${start++}`.padStart(padding, '0');
 }
 
@@ -106,8 +110,8 @@ export function* listTrackerGenerator(max = 99, min = 1) {
 			return true;
 		}
 	};
-	
-} 
+
+}
 
 /**
  * Inverts a HEX color string

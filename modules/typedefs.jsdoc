@@ -119,7 +119,7 @@
 
 /**
  * @callback layerCallback
- * @param {Graph|Graph} arg0 - the canvas or graph object
+ * @param {Graph} arg0 - the canvas or graph object
  * @returns {void}
  */
 

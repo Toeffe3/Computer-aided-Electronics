@@ -11,7 +11,7 @@ const styles = {
 	fill: (color) => (new Style())
 		.noStroke()
 		.setFill(color),
-	stroke: (color, width=1) => (new Style())
+	stroke: (color, width = 1) => (new Style())
 		.noFill()
 		.setStroke(color, width),
 	text: (new Style())
@@ -44,44 +44,44 @@ const highSampleSignal = Series.sineWave(0.053, 4.4, 1, 240, 0).cast("TimeDomain
 
 const desktop = new Desktop();
 
-desktop.createWindow("TimeDomain", {...defaultWindowOptions, origoX: 0, origoY: -200, height: 490, position: {x: 0, y: 0}});
-desktop.createWindow("FreqencyDomain", {...defaultWindowOptions, origoX: -335, origoY: -600, height: 600, width: 670, position: {x: 400, y: 0}});
-desktop.createWindow("Debug window", {...defaultWindowOptions, height: 80, position: {x: 0, y: 490}});
+desktop.createWindow("TimeDomain", { ...defaultWindowOptions, origoX: 0, origoY: -200, height: 490, position: { x: 0, y: 0 } });
+desktop.createWindow("FreqencyDomain", { ...defaultWindowOptions, origoX: -335, origoY: -600, height: 600, width: 670, position: { x: 400, y: 0 } });
+desktop.createWindow("Debug window", { ...defaultWindowOptions, height: 80, position: { x: 0, y: 490 } });
 desktop.callOn(TimeDomain => {
-	TimeDomain.addLayer(new Graph(), "background"); // static background
-	TimeDomain.addLayer(new Graph(), "foreground"); // updateable foreground
+	TimeDomain.addLayer("background"); // static background
+	TimeDomain.addLayer("foreground"); // updateable foreground
 	TimeDomain.call(layer => {
-		layer.setScale(120/400, 1/35);
-		layer.setUnit("s", "V")
+		layer.setScale(120 / 400, 1 / 35);
+		layer.setUnit("s", "V");
 	});
 }, "TimeDomain");
 desktop.callOn(FreqencyDomain => {
-	FreqencyDomain.addLayer(new Graph(), "background"); // static background
-	FreqencyDomain.addLayer(new Graph(), "foreground"); // updateable foreground
+	FreqencyDomain.addLayer("background"); // static background
+	FreqencyDomain.addLayer("foreground"); // updateable foreground
 	FreqencyDomain.call(layer => {
-		layer.setScale(1/10, 1/2);
+		layer.setScale(1 / 10, 1 / 2);
 		layer.setUnit("Hz", "");
 	});
 }, "FreqencyDomain");
 desktop.callOn(DebugWindow => {
-	DebugWindow.addLayer(new Graph(), "background"); // static background
-	DebugWindow.addLayer(new Graph(), "foreground"); // updateable foreground
+	DebugWindow.addLayer("background"); // static background
+	DebugWindow.addLayer("foreground"); // updateable foreground
 }, "Debug window");
 
 let pos = 0;
 
 const program = loop(status => {
-	const {frame, fps, target, time, delta, cycletime} = status;
-	const {width, height, windows} = desktop.getInfo();
+	const { frame, fps, time } = status;
+	const { width, height, windows } = desktop.getInfo();
 	desktop.callOn(TimeDomain =>
 		TimeDomain.callOn(forground => {
-			pos = frame%120;
+			pos = frame % 120;
 			forground.clear();
 			forground.setViewport(pos, null, false);
 			forground.plot(highSampleSignal, styles.signal[0]);
 			forground.plot(lowSampleSignal, styles.signal[1]);
 		}, "foreground"),
-	"TimeDomain");
+		"TimeDomain");
 
 	desktop.callOn(FreqencyDomain =>
 		FreqencyDomain.callOn(forground => {
@@ -89,18 +89,17 @@ const program = loop(status => {
 			forground.plot(highSampleSignal.fft(), styles.signal[0]);
 			forground.plot(lowSampleSignal.fft(), styles.signal[1]);
 		}, "foreground"),
-	"FreqencyDomain");
+		"FreqencyDomain");
 
-	desktop.callOn(DebugWindow => 
+	desktop.callOn(DebugWindow =>
 		DebugWindow.callOn(forground => {
 			forground.clear();
-			forground.drawText(`runtime: ${Math.floor(time/1000/60)}:${Math.floor(time/1000)%60}:${(time%1000).toString().padStart(3,"0")}`, 0, 10, styles.text);
-			forground.drawText(`delta: ${delta} | frame: ${frame}`, 0, 30, styles.text);
-			forground.drawText(`fps: ${fps}/${target} | cycletime: ${cycletime}`, 0, 50, styles.text);
-			forground.drawText(`open windows: ${windows.length}`, 0, 70, styles.text);
-		},"foreground"),
-	"Debug window");
-}, 30);
+			forground.drawText(`runtime: ${Math.floor(time / 1000 / 60)}:${Math.floor(time / 1000) % 60}:${(time % 1000).toString().padStart(3, "0")}`, 0, 10, styles.text);
+			forground.drawText(`fps: ${fps} | frame: ${frame}`, 0, 30, styles.text);
+			forground.drawText(`open windows: ${windows.length}`, 0, 50, styles.text);
+		}, "foreground"),
+		"Debug window");
+});
 
 
 program.onresize(() => {
@@ -118,9 +117,8 @@ program.onresize(() => {
 			background.drawRect(0, 0, background.canvas.width, background.canvas.height, styles.fill("black"), "cornor");
 			background.drawGrid(5, 25, styles.grid);
 			background.drawAxis(10, 50, styles.axis, true, styles.gridHighlight);
-		},"background");
-	},"FreqencyDomain");
+		}, "background");
+	}, "FreqencyDomain");
 });
 
-console.log(program.performance());
 program.start();
