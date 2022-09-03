@@ -7,7 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "ws --cors.origin * -c"
+    "start": "ws --cors.origin *",
+    "documenation": "cd docs/ && echo>index.html && del *.html && cd .. && jsdoc -c ./jsdoc.json -r . && start docs/index.html"
   },
   "author": "Toeffe3",
   "license": "ISC",
@@ -15,6 +16,7 @@
     "eslint": "^8.23.0"
   },
   "dependencies": {
+    "jsdoc-export-default-interop": "^0.3.1",
     "local-web-server": "^5.2.1"
   }
 }

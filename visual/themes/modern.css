@@ -43,10 +43,12 @@ body[data-layout="moderen"] #desktop {
 	height: calc(100vh - var(--menu-height));
 	width: calc(100vw);
 	margin: 0;
+	position: relative;
 }
 
 body[data-layout="moderen"] #desktop .window {
 	position: absolute;
+	color: #fff;
 	border: 2px solid midnightblue;
 }
 

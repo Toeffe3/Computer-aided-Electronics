@@ -1,0 +1,74 @@
+body, #description {
+    font-family: Arial;
+    width: calc(100% - 100px);
+    height: calc(100% - 100px);
+}
+body[data-layout="moderen"].example {
+    margin: 10px 50px;
+    padding: 0;
+    display: grid;
+    grid-template-areas:
+        "description description"
+        "input output"
+        "console console";
+    grid-template-columns: 50vw 50vw;
+    grid-template-rows: auto 500px;
+}
+body[data-layout="moderen"].example #desktop {
+    height: 500px;
+}
+#description {
+    grid-area: description;
+}
+#input {
+    grid-area: input;
+    width: calc(100% - 10px);
+    height: 490px;
+}
+#output {
+    grid-area: output;
+    display: grid;
+    grid-template-areas:
+        "output";
+}
+#console {
+    grid-area: console;
+    width: calc(100% - 100px);
+    height: 200px;
+}
+:root {
+    --menu-height: 0px;
+}
+
+/* Table visibility toggle */
+table {
+    visibility: collapse;
+}
+table tr:nth-child(2n+1) {
+    background-color: #eee;
+}
+a.collapse:focus ~ table {
+    visibility: collapse;
+}
+a.expand:focus ~ table {
+    visibility: visible;
+}
+
+/* Console */
+#console {
+    overflow: auto;
+    white-space: pre;
+    font-family: monospace;
+}
+#console .error {
+    color: red;
+}
+#console .warn {
+    color: orange;
+}
+#console .info {
+    color: blue;
+}
+#console .debug {
+    color: gray;
+}

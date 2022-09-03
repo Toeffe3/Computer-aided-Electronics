@@ -1,21 +1,24 @@
+import Graph from './graph.js';
 /**
- * Class that holds layers of canvasses or graphs
- * @class Layered
- * @property {windowOptions} options - the options for the window
- * @property {Array<Canvas|Graph>} layers - the layers in the layer
- * @property {HTMLElement} htmlhook - the element to which the layer is attached
+ * Layer class
+ * @description This class is used to stack multiple canvases on top of each other
+ * @module layer
  */
- export default class Layered {
+export const name = 'layer';
+export default class Layered {
 	/**
 	 * Creates a new layered object
+	 * @class
 	 * @param {HTMLElement} htmlhook - the html element to attach the canvas to
 	 * @param {windowOptions} options - the options for the window
 	 * @returns {Layered} this
 	 */
 	constructor(htmlhook, options = {}) {
+		/** @type {Object<string, Graph>} */
 		this.layers = {};
 		/** @type {windowOptions} */
 		this.options = options;
+		/** @type {HTMLDivElement} */
 		this.htmlhook = htmlhook;
 		return this;
 	}
@@ -23,17 +26,16 @@
 	/**
 	 * Adds a layer to the layers array
 	 * @description Layers are drawn in the order they are added (last added is on top)
-	 * @param {Graph} layer - the layer to be added
 	 * @param {string} name - the name of the layer
-	 * @param {HTMLElement?} appendTo - the html element to append the layer to, default is the body
+	 * @param {HTMLDivElement?} appendTo - the html element to append the layer to
 	 * @returns {Layered} this
 	 */
-	addLayer(layer, name, appendTo = this.htmlhook) {
-		this.layers[name] = layer;
-		appendTo.appendChild(layer.canvas);
-		layer.update(this.options.width, this.options.height, this.options.origoX, this.options.origoY);
-		layer.canvas.id = `${name}-canvas`;
-		layer.canvas.classList.add("layer");
+	addLayer(name, appendTo = this.htmlhook) {
+		this.layers[name] = new Graph();
+		appendTo.appendChild(this.layers[name].canvas);
+		this.layers[name].update(this.options.width, this.options.height, this.options.origoX, this.options.origoY);
+		this.layers[name].canvas.id = `${name}-canvas`;
+		this.layers[name].canvas.classList.add("layer");
 		return this;
 	}
 	
@@ -51,6 +53,14 @@
 	 */
 	getLayerNames() {
 		return Object.keys(this.layers);
+	}
+
+	/**
+	 * Get the window the layer is attached to
+	 * @returns {HTMLElement} the window
+	 */
+	getWindow() {
+		return this.htmlhook.parentElement;
 	}
 
 	/**

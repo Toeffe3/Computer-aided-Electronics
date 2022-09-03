@@ -1,4 +1,32 @@
-import {listTrackerGenerator} from './functions.js';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: modules/desktop.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: modules/desktop.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {listTrackerGenerator} from './functions.js';
 import Layered from './layer.js';
 /**
  * Desktop class
@@ -11,7 +39,7 @@ export default class Desktop {
 	/**
 	 * Create a desktop
 	 * @class
-	 * @property {Object<string, Layered>} windows - windows
+	 * @property {Object&lt;string, Layered>} windows - windows
 	 * @property {HTMLElement} element - desktop element
 	 * @property {GeneratorFunction} trackingid - incrementing number generator
 	 * @returns {Desktop}
@@ -22,7 +50,7 @@ export default class Desktop {
 		hook.appendChild(desktop);
 		/** @type {HTMLElement} */
 		this.element = document.getElementById("desktop");
-		/** @type {Object<string, Layered>} */
+		/** @type {Object&lt;string, Layered>} */
 		this.windows = {};
 		/** @type {listTrackerGenerator} */
 		this.trackingid = listTrackerGenerator();
@@ -106,11 +134,11 @@ export default class Desktop {
 
 		const wHeader = document.createElement("div");
 		wHeader.classList.add("window-header");
-		wHeader.innerHTML = `<h3 class="window-header-title">${name}</h3>`;
+		wHeader.innerHTML = `&lt;h3 class="window-header-title">${name}&lt;/h3>`;
 		
-		if(options.resizable) wHeader.innerHTML += `<div class="window-header-button window-header-button-resize">⇱</div>`;
-		if(options.dragable) wHeader.innerHTML += `<div class="window-header-button window-header-button-drag">◌</div>`;
-		if(options.closeable) wHeader.innerHTML += `<div class="window-header-button window-header-button-close">✕</div>`;
+		if(options.resizable) wHeader.innerHTML += `&lt;div class="window-header-button window-header-button-resize">⇱&lt;/div>`;
+		if(options.dragable) wHeader.innerHTML += `&lt;div class="window-header-button window-header-button-drag">◌&lt;/div>`;
+		if(options.closeable) wHeader.innerHTML += `&lt;div class="window-header-button window-header-button-close">✕&lt;/div>`;
 		
 		const wBody = document.createElement("div");
 		wBody.classList.add("window-body");
@@ -167,7 +195,7 @@ export default class Desktop {
 
 	/**
 	 * Run a function on a window
-	 * @param {callback<Layered>} func
+	 * @param {callback&lt;Layered>} func
 	 * @param {...string} name
 	 */
 	callOn(func, ...names) {
@@ -179,7 +207,7 @@ export default class Desktop {
 
 	/**
 	 * Run a function on all windows
-	 * @param {callbackVoid<Layered>} func
+	 * @param {callbackVoid&lt;Layered>} func
 	 */
 	call(func) {
 		Object.keys(this.windows).forEach(key => {
@@ -187,4 +215,26 @@ export default class Desktop {
 		});
 	}
 
-}
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-desktop.html">desktop</a></li><li><a href="module-functions.html">functions</a></li><li><a href="module-graph.html">graph</a></li><li><a href="module-layer.html">layer</a></li><li><a href="module-maths_complex.html">maths/complex</a></li><li><a href="module-maths_coordinate.html">maths/coordinate</a></li><li><a href="module-maths_kinematic.html">maths/kinematic</a></li><li><a href="module-maths_matrix.html">maths/matrix</a></li><li><a href="module-maths_pointvector.html">maths/pointvector</a></li><li><a href="module-maths_series.html">maths/series</a></li><li><a href="module-style.html">style</a></li></ul><h3>Classes</h3><ul><li><a href="module-desktop.Desktop.html">Desktop</a></li><li><a href="module-graph.Graph.html">Graph</a></li><li><a href="module-layer.Layered.html">Layered</a></li><li><a href="module-maths_complex.Complex.html">Complex</a></li><li><a href="module-maths_coordinate.Coordinate.html">Coordinate</a></li><li><a href="module-maths_kinematic.Kinematic.html">Kinematic</a></li><li><a href="module-maths_matrix.Matrix.html">Matrix</a></li><li><a href="module-maths_pointvector.PointVector.html">PointVector</a></li><li><a href="module-maths_series.FrequencyDomain.html">FrequencyDomain</a></li><li><a href="module-maths_series.Series.html">Series</a></li><li><a href="module-maths_series.TimeDomain.html">TimeDomain</a></li><li><a href="module-style.Style.html">Style</a></li><li><a href="module-style-ImageStyle.html">ImageStyle</a></li><li><a href="module-style-LineStyle.html">LineStyle</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-Examples.html">Examples</a></li></ul><h3>Global</h3><ul><li><a href="global.html#increment">increment</a></li><li><a href="global.html#listTrackerGenerator">listTrackerGenerator</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Sun Sep 04 2022 00:05:04 GMT+0200 (Centraleuropæisk sommertid)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

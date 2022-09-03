@@ -26,132 +26,131 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** @type {windowOptions} */
-const defaultWindowOptions = {
-    width: 400,
-    height: 400,
-    origoX: 0,
-    origoY: 0,
-    zIndex: 1,
-    resizable: true,
-    closeable: true,
-    dragable: true,
-    position: {
-        x: null,
-        y: null
-    }
-}
+            <pre class="prettyprint source linenums"><code>// Imports
+import { loop, defaultWindowOptions } from './modules/functions.js';
+import Desktop from './modules/desktop.js';
+import Style from './modules/style.js';
+import Graph from './modules/graph.js';
+import Series from './modules/maths/series.js';
+
+/** @typedef {'import ("./modules/typedefs.js")'} Types' */
 
 const styles = {
-    fill: (color) => (new Style())
-        .noStroke()
-        .setFill(color),
-    stroke: (color, width=1) => (new Style())
-        .noFill()
-        .setStroke(color, width),
-    text: (new TextStyle())
-        .setFill("#fff")
-        .setText(16, "consolas", "left"),
-    grid: (new Style())
-        .noFill()
-        .setStroke("#aaa8", 0.75),
-    gridHighlight: (new Style())
-        .noFill()
-        .setStroke("#aaaa", 1.25),
-    axis: (new TextStyle())
-        .setFill("#fffa")
-        .setText(12, "consolas")
-        .setStroke("#fffa", 2),
+	fill: (color) => (new Style())
+		.noStroke()
+		.setFill(color),
+	stroke: (color, width=1) => (new Style())
+		.noFill()
+		.setStroke(color, width),
+	text: (new Style())
+		.setFill("#fff")
+		.setText(16, "consolas", "left"),
+	grid: (new Style())
+		.noFill()
+		.setStroke("#aaa8", 0.75),
+	gridHighlight: (new Style())
+		.noFill()
+		.setStroke("#aaaa", 1.25),
+	axis: (new Style())
+		.setFill("#fffa")
+		.setText(12, "consolas")
+		.setStroke("#fffa", 2),
 };
 styles.signal = [
-    styles.stroke("#0f8", 2.25),
-    styles.stroke("#f80", 2.25),
-    styles.stroke("#f08", 2.25),
-    styles.stroke("#8f0", 2.25),
-    styles.stroke("#08f", 2.25),
-    styles.stroke("#80f", 2.25),
+	styles.stroke("#0f8", 2.25),
+	styles.stroke("#f80", 2.25),
+	styles.stroke("#f08", 2.25),
+	styles.stroke("#8f0", 2.25),
+	styles.stroke("#08f", 2.25),
+	styles.stroke("#80f", 2.25),
 ];
 
 
-const lowSampleSignal = Series.sineWave(0.053, 4.4, 0.1, 120, 0).cast("TimeDomain");
-const highSampleSignal = Series.sineWave(0.053, 4.4, 1, 120, 0).cast("TimeDomain");
+const lowSampleSignal = Series.sineWave(0.053, 4.4, 0.1, 240, 0).cast("TimeDomain");
+const highSampleSignal = Series.sineWave(0.053, 4.4, 1, 240, 0).cast("TimeDomain");
 
 
 const desktop = new Desktop();
 
-desktop.createWindow("TimeDomain", {...defaultWindowOptions, origoX: 0, origoY: -200, height: 490});
-desktop.createWindow("FreqencyDomain", {...defaultWindowOptions, origoX: -335, origoY: -600, height: 600, width: 670});
-desktop.createWindow("Debug window", {...defaultWindowOptions, height: 80, position: {y: 490, x: 0}});
+desktop.createWindow("TimeDomain", {...defaultWindowOptions, origoX: 0, origoY: -200, height: 490, position: {x: 0, y: 0}});
+desktop.createWindow("FreqencyDomain", {...defaultWindowOptions, origoX: -335, origoY: -600, height: 600, width: 670, position: {x: 400, y: 0}});
+desktop.createWindow("Debug window", {...defaultWindowOptions, height: 80, position: {x: 0, y: 490}});
 desktop.callOn(TimeDomain => {
-    TimeDomain.addLayer(new Graph(), "foreground"); // updateable foreground
-    TimeDomain.addLayer(new Graph(), "background"); // static background
-    TimeDomain.call(layer => {
-        layer.setScale(120/400, 1/35);
-        layer.setUnit("s", "V")
-    });
+	TimeDomain.addLayer(new Graph(), "background"); // static background
+	TimeDomain.addLayer(new Graph(), "foreground"); // updateable foreground
+	TimeDomain.call(layer => {
+		layer.setScale(120/400, 1/35);
+		layer.setUnit("s", "V")
+	});
 }, "TimeDomain");
 desktop.callOn(FreqencyDomain => {
-    FreqencyDomain.addLayer(new Graph(), "foreground"); // updateable foreground
-    FreqencyDomain.addLayer(new Graph(), "background"); // static background
-    FreqencyDomain.call(layer => {
-        layer.setScale(1/10, 1/2);
-        layer.setUnit("Hz", "");
-    });
+	FreqencyDomain.addLayer(new Graph(), "background"); // static background
+	FreqencyDomain.addLayer(new Graph(), "foreground"); // updateable foreground
+	FreqencyDomain.call(layer => {
+		layer.setScale(1/10, 1/2);
+		layer.setUnit("Hz", "");
+	});
 }, "FreqencyDomain");
 desktop.callOn(DebugWindow => {
-    DebugWindow.addLayer(new Canvas(), "foreground"); // updateable foreground
-    DebugWindow.addLayer(new Canvas(), "background"); // static background
+	DebugWindow.addLayer(new Graph(), "background"); // static background
+	DebugWindow.addLayer(new Graph(), "foreground"); // updateable foreground
 }, "Debug window");
 
+let pos = 0;
+
 const program = loop(status => {
-    const {frame, fps, target, time, delta, average} = status;
-    const {width, height, windows} = desktop.getInfo();
-    desktop.callOn(TimeDomain =>
-        TimeDomain.callOn(forground => {
-            forground.clear();
-            forground.drawRect(0, 0, forground.canvas.width, forground.canvas.height, styles.fill("black"), "cornor");
-            forground.plot(highSampleSignal, styles.signal[0]);
-            forground.plot(lowSampleSignal, styles.signal[1]);
-        }, "foreground"),
-    "TimeDomain");
+	const {frame, fps, target, time, delta, cycletime} = status;
+	const {width, height, windows} = desktop.getInfo();
+	desktop.callOn(TimeDomain =>
+		TimeDomain.callOn(forground => {
+			pos = frame%120;
+			forground.clear();
+			forground.setViewport(pos, null, false);
+			forground.plot(highSampleSignal, styles.signal[0]);
+			forground.plot(lowSampleSignal, styles.signal[1]);
+		}, "foreground"),
+	"TimeDomain");
 
-    desktop.callOn(FreqencyDomain =>
-        FreqencyDomain.callOn(forground => {
-            forground.clear();
-            forground.drawRect(0, 0, forground.canvas.width, forground.canvas.height, styles.fill("black"), "cornor");
-            forground.plot(highSampleSignal.fft(), styles.signal[0]);
-            forground.plot(lowSampleSignal.fft(), styles.signal[1]);
-        }, "foreground"),
-    "FreqencyDomain");
+	desktop.callOn(FreqencyDomain =>
+		FreqencyDomain.callOn(forground => {
+			forground.clear();
+			forground.plot(highSampleSignal.fft(), styles.signal[0]);
+			forground.plot(lowSampleSignal.fft(), styles.signal[1]);
+		}, "foreground"),
+	"FreqencyDomain");
 
-    desktop.callOn(DebugWindow => 
-        DebugWindow.callOn(forground => {
-            forground.clear();
-            forground.drawText(`runtime: ${Math.floor(time/1000/60)}:${Math.floor(time/1000)%60}:${(time%1000).toString().padStart(3,"0")}`, 0, 10, styles.text);
-            forground.drawText(`delta: ${delta} | frame: ${frame}`, 0, 30, styles.text);
-            forground.drawText(`fps: ${fps} | average: ${average}/${target}`, 0, 50, styles.text);
-            forground.drawText(`open windows: ${windows.length}`, 0, 70, styles.text);
-        },"foreground"),
-    "Debug window");
+	desktop.callOn(DebugWindow => 
+		DebugWindow.callOn(forground => {
+			forground.clear();
+			forground.drawText(`runtime: ${Math.floor(time/1000/60)}:${Math.floor(time/1000)%60}:${(time%1000).toString().padStart(3,"0")}`, 0, 10, styles.text);
+			forground.drawText(`delta: ${delta} | frame: ${frame}`, 0, 30, styles.text);
+			forground.drawText(`fps: ${fps}/${target} | cycletime: ${cycletime}`, 0, 50, styles.text);
+			forground.drawText(`open windows: ${windows.length}`, 0, 70, styles.text);
+		},"foreground"),
+	"Debug window");
 }, 30);
 
+
 program.onresize(() => {
-    desktop.callOn(TimeDomain => {
-        TimeDomain.callOn(background => {
-            background.clear();
-            background.drawGrid(10, 0.5, styles.grid);
-            background.drawAxis(60, 1, styles.axis, true, styles.gridHighlight);
-        }, "background");
-    }, "TimeDomain");
-    desktop.callOn(FreqencyDomain => {
-        FreqencyDomain.callOn(background => {
-            background.clear();
-            background.drawGrid(5, 25, styles.grid);
-            background.drawAxis(10, 50, styles.axis, true, styles.gridHighlight);
-        },"background");
-    },"FreqencyDomain");
+	desktop.callOn(TimeDomain => {
+		TimeDomain.callOn(background => {
+			background.clear();
+			background.drawRect(0, 0, background.canvas.width, background.canvas.height, styles.fill("black"), "cornor");
+			background.drawGrid(10, 0.5, styles.grid);
+			background.drawAxis(60, 1, styles.axis, true, styles.gridHighlight);
+		}, "background");
+	}, "TimeDomain");
+	desktop.callOn(FreqencyDomain => {
+		FreqencyDomain.callOn(background => {
+			background.clear();
+			background.drawRect(0, 0, background.canvas.width, background.canvas.height, styles.fill("black"), "cornor");
+			background.drawGrid(5, 25, styles.grid);
+			background.drawAxis(10, 50, styles.axis, true, styles.gridHighlight);
+		},"background");
+	},"FreqencyDomain");
 });
 
+console.log(program.performance());
 program.start();</code></pre>
         </article>
     </section>
@@ -162,13 +161,13 @@ program.start();</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Canvas.html">Canvas</a></li><li><a href="Complex.html">Complex</a></li><li><a href="Coordinate.html">Coordinate</a></li><li><a href="Desktop.html">Desktop</a></li><li><a href="FourierSeries.html">FourierSeries</a></li><li><a href="Graph.html">Graph</a></li><li><a href="ImageStyle.html">ImageStyle</a></li><li><a href="Kinematic.html">Kinematic</a></li><li><a href="Layered.html">Layered</a></li><li><a href="LineStyle.html">LineStyle</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Series.html">Series</a></li><li><a href="Style.html">Style</a></li><li><a href="TextStyle.html">TextStyle</a></li><li><a href="TimeDomain.html">TimeDomain</a></li><li><a href="Vector.html">Vector</a></li></ul><h3>Global</h3><ul><li><a href="global.html#defaultWindowOptions">defaultWindowOptions</a></li><li><a href="global.html#degToRad">degToRad</a></li><li><a href="global.html#FIT">FIT</a></li><li><a href="global.html#getCSSVariable">getCSSVariable</a></li><li><a href="global.html#increment">increment</a></li><li><a href="global.html#incrementGenerator">incrementGenerator</a></li><li><a href="global.html#invertColorString">invertColorString</a></li><li><a href="global.html#listTrackerGenerator">listTrackerGenerator</a></li><li><a href="global.html#loop">loop</a></li><li><a href="global.html#radToDeg">radToDeg</a></li><li><a href="global.html#sum">sum</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-desktop.html">desktop</a></li><li><a href="module-functions.html">functions</a></li><li><a href="module-graph.html">graph</a></li><li><a href="module-layer.html">layer</a></li><li><a href="module-maths_complex.html">maths/complex</a></li><li><a href="module-maths_coordinate.html">maths/coordinate</a></li><li><a href="module-maths_kinematic.html">maths/kinematic</a></li><li><a href="module-maths_matrix.html">maths/matrix</a></li><li><a href="module-maths_pointvector.html">maths/pointvector</a></li><li><a href="module-maths_series.html">maths/series</a></li><li><a href="module-style.html">style</a></li></ul><h3>Classes</h3><ul><li><a href="module-desktop.Desktop.html">Desktop</a></li><li><a href="module-graph.Graph.html">Graph</a></li><li><a href="module-layer.Layered.html">Layered</a></li><li><a href="module-maths_complex.Complex.html">Complex</a></li><li><a href="module-maths_coordinate.Coordinate.html">Coordinate</a></li><li><a href="module-maths_kinematic.Kinematic.html">Kinematic</a></li><li><a href="module-maths_matrix.Matrix.html">Matrix</a></li><li><a href="module-maths_pointvector.PointVector.html">PointVector</a></li><li><a href="module-maths_series.FrequencyDomain.html">FrequencyDomain</a></li><li><a href="module-maths_series.Series.html">Series</a></li><li><a href="module-maths_series.TimeDomain.html">TimeDomain</a></li><li><a href="module-style.Style.html">Style</a></li><li><a href="module-style-ImageStyle.html">ImageStyle</a></li><li><a href="module-style-LineStyle.html">LineStyle</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-Examples.html">Examples</a></li></ul><h3>Global</h3><ul><li><a href="global.html#increment">increment</a></li><li><a href="global.html#listTrackerGenerator">listTrackerGenerator</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Tue Aug 30 2022 17:22:43 GMT+0200 (Centraleuropæisk sommertid)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Sun Sep 04 2022 00:05:04 GMT+0200 (Centraleuropæisk sommertid)
 </footer>
 
 <script> prettyPrint(); </script>

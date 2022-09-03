@@ -1,10 +1,15 @@
 /**
- * Create a coordinate point
- * @class Coordinate
+ * Cordinate space class
+ * @description A coordinate space is a 2d space
  * @see {@link https://en.wikipedia.org/wiki/Cartesian_coordinate_system Cartesian coordinate system on Wikipedia}
+ * @module maths/coordinate
  */
+export const name = 'coordinate';
+
 export default class Coordinate {
 	/**
+	 * Create a coordinate point
+	 * @class
 	 * @constructor
 	 * @param {number} x - x position
 	 * @param {number} y - y position

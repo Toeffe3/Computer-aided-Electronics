@@ -1,17 +1,17 @@
 /* css variables */
 :root {
-    --menu-height: 50px;
+	--menu-height: 50px;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+	margin: 0;
+	padding: 0;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
 }
 
 body[data-theme="dark"] {
-    background-color: #1d1d1d;
-    color: #eaeaea;
+	background-color: #1d1d1d;
+	color: #eaeaea;
 }

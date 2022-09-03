@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport">
+	<title>Getting Started</title>
+	<link rel="stylesheet" href="main.css">
+	<link rel="stylesheet" href="../../visual/themes/modern.css">
+	<script src="tools.js"></script>
+</head>
+<body data-layout="moderen" class="example">
+	<div id="description">
+		<h1>Getting Started</h1>
+		Here is a list over all the modules, and their functions. <a class="collapse" href="#">hide</a> | <a class="expand" href="#">show</a>
+		<table cols="3">
+			<tr>
+				<th colspan="2">Module</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td colspan="2" id="tblm-function.js">functions.js</td>
+				<td>Contains functions that are used in other modules.</td>
+			</tr>
+			<tr>
+				<td colspan="2" id="tblm-graph.js">graph.js</td>
+				<td>Contains the Graph class, which enables all visualizations apart from UI.</td>
+			</tr>
+			<tr>
+				<td colspan="2" id="tblm-graph.js">style.js</td>
+				<td>Contains the Style class, which enables styling of the canvas tool in <a href="#tblm-graph.js">Graph</a> class.</td>
+			</tr>
+			<tr>
+				<td colspan="2" id="tblm-layer.js">layer.js</td>
+				<td>Contains the Layer class, which enables stacking and handling multiple <a href="#tblm-graph.js">Graph</a>'s.</td>
+			</tr>
+			<tr>
+				<td colspan="2" id="tblm-desktop.js">desktop.js</td>
+				<td>Contains Desktop class, which allows manipulation of multiple <a href="#tblm-layer.js">Layer</a>'s.</td>
+			</tr>
+			<tr>
+				<td rowspan="7">maths/</td>
+				<td id="tblm-maths-coordiante.js">coordinate.js</td>
+				<td>Contains the Coordinate class, which enables the use of coordinates in the <a href="#tblm-graph.js">Graph</a> class.</td>
+			</tr>
+			<tr>
+				<td id="tblm-maths-pointvector.js">pointvector.js</td>
+				<td>Contains the Point and Vector classes, which extends the <a href="#tblm-maths-coordiante.js">Coordinate</a> class.</td>
+			</tr>
+			<tr>
+				<td id="tblm-maths-complex.js">complex.js</td>
+				<td>Contains the Complex class, which makes handling complex numbers easier.</td>
+			</tr>
+			<tr>
+				<td id="tblm-maths-matrix.js">matrix.js</td>
+				<td>Contains the Matrix class, which makes handling matrices easier.</td>
+			</tr>
+			<tr>
+				<td id="tblm-maths-series.js">series.js</td>
+				<td>Contains the Series class, which makes handling series easier.</td>
+			</tr>
+			<tr>
+				<td id="tblm-maths-kinematics.js">kinematics.js</td>
+				<td>Contains the Kinematics class, which makes handling kinematics easier.</td>
+			</tr>
+		</table>
+		<p>
+			This example shows how to create a window with 2 layers, and how to draw on them.
+			The 2 layers are <em>background</em> (firstly created will be on the bottom) and <em>foreground</em>.
+			The <em>background</em> layer will be used to draw the grid and will not be cleared, while the <em>foreground</em> layer is cleared and redrawn continuously.
+			The desktop- and layered element has a <code>callOn</code> method, which is used to execute a function as a selection of layers or graphs.
+			The <code>call</code> method will call all. Both methods will return one layer or graph at a time as a parameter to the function.
+		</p>
+	</div>
+	<textarea name="input" class="split" id="input" autocomplete="off" onerror="getLine">
+import { loop, defaultWindowOptions } from "../../modules/functions.js";
+import Desktop from "../../modules/desktop.js";
+import Style from "../../modules/style.js";
+
+const desktop = new Desktop(attachToExample);
+
+desktop.createWindow("plot1", {
+  ...defaultWindowOptions,
+  origoX: -200,
+  origoY: -200,
+  closeable: false,
+  dragable: false,
+  resizable: false
+});
+desktop.callOn(plot1 => {
+  plot1.addLayer("background");
+  plot1.addLayer("foreground");
+  plot1.call(layer => layer.setScale(4/400, 4/400));
+  plot1.callOn(background => {
+	background.clear();
+	background.drawRect(
+	  0, 0,
+	  background.width, background.height,
+	  (new Style()).setFill("black"),
+	  "cornor"
+	);
+	background.drawGrid(
+	  0.5, 0.5,
+	  (new Style()).setStroke("#aaa8", 0.75)
+	);
+	background.drawAxis(
+	  1, 1,
+	  (new Style()).setFill("#fffa").setStroke("#fffa", 2).setText(12, "consolas"),
+	  true,
+	  (new Style()).setStroke("#aaaa", 1.25)
+	);
+	
+  }, "background");
+}, "plot1");
+
+const program = loop(status => {
+  const {frame, fps} = status;
+  desktop.callOn(plot1 => {
+
+    plot1.callOn(forground => {
+      forground.clear();
+      forground.drawLine(
+        0, 0,
+        Math.cos((frame%360)*Math.PI/180), -Math.sin((frame%360)*Math.PI/180),
+        (new Style())
+          .setStroke("red", 2),
+        "origo"
+      );
+	  forground.drawText(
+		`fps: ${fps}`,
+		10, 10,
+		(new Style())
+          .setFill("#0f0")
+          .setText(12, "consolas", "left", "top"),
+        "cornor"
+      );
+    }, "foreground");
+  
+    plot1.callOn(background => {
+      background.drawCircle(
+        Math.cos((frame%360)*Math.PI/180), -Math.sin((frame%360)*Math.PI/180),
+        0.01,
+        (new Style())
+          .setFill("#00f3"),
+		"origo"
+      );
+    }, "background");
+
+  }, "plot1");
+
+});
+
+program.start();
+
+	</textarea>
+	<div class="split" id="output"></div>
+	<div id="console"></div>
+	<script src="livescript.js" defer></script>
+</body>
+</html>

@@ -1,25 +1,11 @@
 // Imports
-import { loop } from './modules/functions.js';
-import Graph from './modules/graph.js';
-import Style from './modules/style.js';
+import { loop, defaultWindowOptions } from './modules/functions.js';
 import Desktop from './modules/desktop.js';
+import Style from './modules/style.js';
+import Graph from './modules/graph.js';
 import Series from './modules/maths/series.js';
 
-/** @type {windowOptions} */
-const defaultWindowOptions = {
-	width: 400,
-	height: 400,
-	origoX: 0,
-	origoY: 0,
-	zIndex: 1,
-	resizable: true,
-	loseable: true,
-	dragable: true,
-	position: {
-		x: null,
-		y: null
-	}
-}
+/** @typedef {'import ("./modules/typedefs.js")'} Types' */
 
 const styles = {
 	fill: (color) => (new Style())
@@ -58,9 +44,9 @@ const highSampleSignal = Series.sineWave(0.053, 4.4, 1, 240, 0).cast("TimeDomain
 
 const desktop = new Desktop();
 
-desktop.createWindow("TimeDomain", {...defaultWindowOptions, origoX: 0, origoY: -200, height: 490});
-desktop.createWindow("FreqencyDomain", {...defaultWindowOptions, origoX: -335, origoY: -600, height: 600, width: 670});
-desktop.createWindow("Debug window", {...defaultWindowOptions, height: 80, position: {y: 490, x: 0}});
+desktop.createWindow("TimeDomain", {...defaultWindowOptions, origoX: 0, origoY: -200, height: 490, position: {x: 0, y: 0}});
+desktop.createWindow("FreqencyDomain", {...defaultWindowOptions, origoX: -335, origoY: -600, height: 600, width: 670, position: {x: 400, y: 0}});
+desktop.createWindow("Debug window", {...defaultWindowOptions, height: 80, position: {x: 0, y: 490}});
 desktop.callOn(TimeDomain => {
 	TimeDomain.addLayer(new Graph(), "background"); // static background
 	TimeDomain.addLayer(new Graph(), "foreground"); // updateable foreground

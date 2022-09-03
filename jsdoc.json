@@ -1,11 +1,11 @@
 
 
 {
-	"plugins": [],
+	"plugins": ["./node_modules/jsdoc-export-default-interop/dist/index"],
 	"recurseDepth": 10,
 	"source": {
 		"includePattern": ".+\\.js(doc|x)?$",
-		"excludePattern": "(^|\\/|\\\\)_"
+    	"excludePattern": "node_modules|examples"
 	},
 	"sourceType": "module",
 	"tags": {
@@ -19,7 +19,7 @@
 		"encoding": "utf8",
 		"destination": "./docs/",
 		"recurse": true,
-		"tutorials": "./docs/examples"
+		"tutorials": "./docs/tutorials"
 	}
 }
 

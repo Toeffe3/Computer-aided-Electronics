@@ -1,4 +1,32 @@
-import {increment} from './functions.js';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: modules/graph.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: modules/graph.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {increment} from './functions.js';
 import Series, {TimeDomain, FrequencyDomain} from './maths/series.js';
 import Coordinate from './maths/coordinate.js';
 import Style from './style.js';
@@ -132,12 +160,12 @@ export default class Graph {
 		
 		// draw lines from 0,0 with spacing between each line until the edge of the canvas
 		const x = Math.floor(left/spacingX)*spacingX;
-		for(let i=x; i<=right; i+=spacingX) {
+		for(let i=x; i&lt;=right; i+=spacingX) {
 			this.context.moveTo(i / scaleX, top);
 			this.context.lineTo(i / scaleX, bottom);
 		}
 		const y = Math.floor(top/spacingY)*spacingY;
-		for(let i=y; i<=bottom; i+=spacingY) {
+		for(let i=y; i&lt;=bottom; i+=spacingY) {
 			this.context.moveTo(left, i / scaleY);
 			this.context.lineTo(right, i / scaleY);
 		}
@@ -376,7 +404,7 @@ export default class Graph {
 		this.context.closePath();
 		// Add event listener to the button
 		this.canvas().onclick = (e) => {
-			if(e.x > x && e.x < x + width && e.y > y && e.y < y + height) callback();
+			if(e.x > x &amp;&amp; e.x &lt; x + width &amp;&amp; e.y > y &amp;&amp; e.y &lt; y + height) callback();
 		};
 		return this;
 	}
@@ -395,7 +423,7 @@ export default class Graph {
 		if(series instanceof FrequencyDomain) {
 			const {frequency, amplitude} = series.getSeries();
 			// Stick plot
-			for(let i = 0; i < frequency.length; i++) {
+			for(let i = 0; i &lt; frequency.length; i++) {
 				this.context.beginPath();
 				this.context.moveTo(frequency[i]/scaleX, 0);
 				this.context.lineTo(frequency[i]/scaleX, amplitude[i]/scaleY);
@@ -406,7 +434,7 @@ export default class Graph {
 			const {time, data} = series.getSeries();
 			this.context.beginPath();
 			this.context.moveTo(time[0]/scaleX, data[0]/scaleY);
-			for(let i = 1; i < time.length; i++) this.context.lineTo(time[i]/scaleX, data[i]/scaleY);
+			for(let i = 1; i &lt; time.length; i++) this.context.lineTo(time[i]/scaleX, data[i]/scaleY);
 			this.context.stroke();
 		}
 		this.reference(ref);
@@ -425,7 +453,7 @@ export default class Graph {
 		const {x: scaleX, y: scaleY} = this.getAxis();
 		this.context.beginPath();
 		this.context.moveTo(0, data[0]/scaleY);
-		for(let i = 1; i < data.length; i++) this.context.lineTo(i/scaleX, data[i]/scaleY);
+		for(let i = 1; i &lt; data.length; i++) this.context.lineTo(i/scaleX, data[i]/scaleY);
 		this.context.stroke();
 		return this;
 	}
@@ -466,7 +494,7 @@ export default class Graph {
 		this.context.moveTo(left, y);
 		this.context.lineTo(right, y);
 		
-		for(let i = 0; i <= right; i+=intervalX / scaleX) {
+		for(let i = 0; i &lt;= right; i+=intervalX / scaleX) {
 			this.context.moveTo(i, y-5);
 			this.context.lineTo(i, y+5);
 		}
@@ -474,7 +502,7 @@ export default class Graph {
 			this.context.moveTo(i, y-5);
 			this.context.lineTo(i, y-5);
 		}
-		for(let i = 0; i <= bottom; i+=intervalY / scaleY) {
+		for(let i = 0; i &lt;= bottom; i+=intervalY / scaleY) {
 			this.context.moveTo(x-5, i);
 			this.context.lineTo(x+5, i);
 		}
@@ -490,7 +518,7 @@ export default class Graph {
 			const {x: scaleX, y: scaleY} = this.getAxis();
 			
 			const x = Math.ceil(Math.min(left, right)/intervalX)*intervalX;
-			for(let i = x; i <= Math.max(left, right); i += intervalX) {
+			for(let i = x; i &lt;= Math.max(left, right); i += intervalX) {
 				if (i === 0) continue; // Don't draw 0
 				this.context.save();
 				this.context.translate(i / scaleX, 0);
@@ -499,7 +527,7 @@ export default class Graph {
 				this.context.restore();
 			}
 			const y = Math.ceil(Math.min(top, bottom)/intervalY)*intervalY;
-			for(let i = y; i <= Math.max(top, bottom); i += intervalY) {
+			for(let i = y; i &lt;= Math.max(top, bottom); i += intervalY) {
 				if (i === 0) continue; // Don't draw 0
 				this.context.save();
 				this.context.translate(0, i / scaleY);
@@ -552,3 +580,26 @@ export default class Graph {
 
 }
 
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-desktop.html">desktop</a></li><li><a href="module-functions.html">functions</a></li><li><a href="module-graph.html">graph</a></li><li><a href="module-layer.html">layer</a></li><li><a href="module-maths_complex.html">maths/complex</a></li><li><a href="module-maths_coordinate.html">maths/coordinate</a></li><li><a href="module-maths_kinematic.html">maths/kinematic</a></li><li><a href="module-maths_matrix.html">maths/matrix</a></li><li><a href="module-maths_pointvector.html">maths/pointvector</a></li><li><a href="module-maths_series.html">maths/series</a></li><li><a href="module-style.html">style</a></li></ul><h3>Classes</h3><ul><li><a href="module-desktop.Desktop.html">Desktop</a></li><li><a href="module-graph.Graph.html">Graph</a></li><li><a href="module-layer.Layered.html">Layered</a></li><li><a href="module-maths_complex.Complex.html">Complex</a></li><li><a href="module-maths_coordinate.Coordinate.html">Coordinate</a></li><li><a href="module-maths_kinematic.Kinematic.html">Kinematic</a></li><li><a href="module-maths_matrix.Matrix.html">Matrix</a></li><li><a href="module-maths_pointvector.PointVector.html">PointVector</a></li><li><a href="module-maths_series.FrequencyDomain.html">FrequencyDomain</a></li><li><a href="module-maths_series.Series.html">Series</a></li><li><a href="module-maths_series.TimeDomain.html">TimeDomain</a></li><li><a href="module-style.Style.html">Style</a></li><li><a href="module-style-ImageStyle.html">ImageStyle</a></li><li><a href="module-style-LineStyle.html">LineStyle</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-Examples.html">Examples</a></li></ul><h3>Global</h3><ul><li><a href="global.html#increment">increment</a></li><li><a href="global.html#listTrackerGenerator">listTrackerGenerator</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Sun Sep 04 2022 00:05:04 GMT+0200 (Centraleuropæisk sommertid)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
