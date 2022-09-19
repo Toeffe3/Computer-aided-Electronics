@@ -97,7 +97,8 @@ desktop.callOn(plot1 => {
 	  0, 0,
 	  background.width, background.height,
 	  (new Style()).setFill("black"),
-	  "cornor"
+	  "cornor",
+	  false
 	);
 	background.drawGrid(
 	  0.5, 0.5,
@@ -132,7 +133,8 @@ const program = loop(status => {
 		(new Style())
           .setFill("#0f0")
           .setText(12, "consolas", "left", "top"),
-        "cornor"
+        "cornor",
+		false
       );
     }, "foreground");
   
