@@ -2,6 +2,7 @@ import {increment} from './functions.js';
 import Series, {TimeDomain, FrequencyDomain} from './maths/series.js';
 import Coordinate from './maths/coordinate.js';
 import Style from './style.js';
+import PointVector from './maths/pointvector.js';
 /**
  * Graph calss
  * @description Graph class for drawing on HTML5 canvas's
@@ -25,8 +26,9 @@ export default class Graph {
 		
 		/** @type {CanvasRenderingContext2D?} */
 		this.context = null;
-		/** @type {"origo"|"center"|"corner"} */
+		/** @type {"origo"|"center"|"cornor"|"custom"} */
 		this.refposition = "origo";
+		this.customref = null;
 		this.origoX = 0;
 		this.origoY = 0;
 		this.width = 0;
@@ -91,17 +93,33 @@ export default class Graph {
 
 	/**
 	 * Get the limits of the canvas
-	 * @param  {boolean} [scaling=true] - if false, the scaling not incluede
+	 * @param  {boolean} [scaling=false] - if true, limit are scaled to the view 
 	 * @returns {Object} the edges of the canvas
 	 */
-	getLimits(scaling=true) {
+	getLimits(scaling=false) {
 		const {x, y} = scaling ? this.getAxis() : {x: 1, y: 1};
 		return {
 			left: this.origoX * x,
 			right: (this.origoX + this.width) * x,
 			top: this.origoY * y,
 			bottom: (this.origoY + this.height) * y
-		};
+		};	
+	}
+
+	/**
+	 * Convert cordiantes to canvas coordinates
+	 * @param  {boolean} [scaling=true] - scale to canvas coordinates or absolute coordinates
+	 * @param  {...number} n - pairs of 2: x0,y0, x1,y1, x2,y2,...
+	 * @returns {{x: number, y: number}} the canvas coordinates
+	 */
+	convertPoint(scale = true, ...n) {
+		const {x: xscale, y: yscale} = scale ? this.getAxis() : {x: 1, y: 1};
+		const points = [];
+		for(let i=0; i<n.length; i+=2) points.push({
+			x: (n[i]) / xscale,
+			y: (n[i+1]) / yscale
+		});
+		return points;
 	}
 
 	/**
@@ -116,57 +134,130 @@ export default class Graph {
 	
 	/**
 	 * Draws a grid on the canvas
-	 * @param  {number} spacingX - the interval between the lines in the x axis
-	 * @param  {number} spacingY - the interval between the lines in the y axis
-	 * @param  {Style} style - the style
+	 * @param {number} spacingX - the interval between the lines in the x axis
+	 * @param {number} spacingY - the interval between the lines in the y axis
+	 * @param {Style} style - the style
 	 * @returns {Graph} this
 	 */
 	drawGrid(spacingX, spacingY, style) {
 		const ref = this.reference("origo");
 		style.apply(this.context);
+		
+		let {left, right, top, bottom} = this.getLimits();
+		const {x: scaleX, y: scaleY} = this.getAxis(true);
+		
+		const x = Math.ceil(Math.min(left, right)/spacingX * scaleX)*spacingX ;
+		for(let i = x; i <= Math.max(left, right) * scaleX; i += spacingX) {
+			this.context.save();
+			this.context.translate((i / scaleX),0);
+			this.context.beginPath();
+			this.context.moveTo(0, top);
+			this.context.lineTo(0, bottom);
+			this.context.stroke();
+			this.context.restore();
+		}
+		const y = Math.ceil(Math.min(top, bottom)/spacingY * scaleY)*spacingY;
+		for(let i = y; i <= Math.max(top, bottom) * scaleY; i += spacingY) {
+			this.context.save();
+			this.context.translate(0, (i / scaleY));
+			this.context.beginPath();
+			this.context.moveTo(left, 0);
+			this.context.lineTo(right, 0);
+			this.context.stroke();
+			this.context.restore();
+		}
+		this.reference(ref);
+		return this;
+	}
 
-		const {left, right, top, bottom} = this.getLimits(false);
+	/**
+	 * Draws axis with labels and optional numbering
+	 * @override
+	 * @param {number} intervalX - the interval between the marks on the x axis
+	 * @param {number} intervalY - the interval between the marks on the y axis
+	 * @param {Style} style - the style
+	 * @param {boolean} [numbering=true] - if true the marks will be numbered
+	 * @param {Style?} [gridStyle] - if given the grid will be drawn
+	 * @returns {Graph} this
+	 */
+	 drawAxis(intervalX, intervalY, style, numbering = false, gridStyle = null) {
+		const ref = this.reference("origo");
+		if(gridStyle) this.drawGrid(intervalX, intervalY, gridStyle);
+		style.apply(this.context);
+		
+		let {left, right, top, bottom} = this.getLimits();
 		const {x: scaleX, y: scaleY} = this.getAxis(true);
 
 		this.context.beginPath();
-		
-		// draw lines from 0,0 with spacing between each line until the edge of the canvas
-		const x = Math.floor(left/spacingX)*spacingX;
-		for(let i=x; i<=right; i+=spacingX) {
-			this.context.moveTo(i / scaleX, top);
-			this.context.lineTo(i / scaleX, bottom);
-		}
-		const y = Math.floor(top/spacingY)*spacingY;
-		for(let i=y; i<=bottom; i+=spacingY) {
-			this.context.moveTo(left, i / scaleY);
-			this.context.lineTo(right, i / scaleY);
-		}
-
+		this.context.moveTo(left, 0);
+		this.context.lineTo(right, 0);
+		this.context.moveTo(0, top);
+		this.context.lineTo(0, bottom);
 		this.context.stroke();
+		
+		const x = Math.ceil(Math.min(left, right)/intervalX * scaleX)*intervalX ;
+		for(let i = x; i <= Math.max(left, right) * scaleX; i += intervalX) {
+			if(i !== 0) {
+				this.context.save();
+				this.context.translate((i / scaleX),0);
+				this.context.beginPath();
+				this.context.moveTo(0, -5);
+				this.context.lineTo(0, +5);
+				this.context.stroke();
+				this.context.textAlign = "center";
+				if(numbering) this.context.fillText(`${i}${this.axis.x.unit}`, 0, -14);
+				this.context.restore();
+			}
+		}
+		const y = Math.ceil(Math.min(top, bottom)/intervalY * scaleY)*intervalY;
+		for(let i = y; i <= Math.max(top, bottom) * scaleY; i += intervalY) {
+			if (i !== 0) {
+				this.context.save();
+				this.context.translate(0, (i / scaleY));
+				this.context.beginPath();
+				this.context.moveTo(-5, 0);
+				this.context.lineTo(+5, 0);
+				this.context.stroke();
+				this.context.textAlign = "left";
+				if(numbering) this.context.fillText(`${i}${this.axis.y.unit}`, 10, 0);
+				this.context.restore();
+			}
+		}
 		this.reference(ref);
 		return this;
 	}
 
 	/**
 	 * Set the reference point of the context
-	 * @param {"origo"|"center"|"cornor"} [position="origo"] - the reference point
+	 * @param {"origo"|"center"|"cornor"|Coordinate} [position="origo"] - the reference point
 	 * @param {boolean} [log=false] - Print information log to the console
 	 * @returns {"origo"|"center"|"cornor"} the previous reference point
 	 */
 	reference(position = "origo", log = false) {
-		if(position === null || this.refposition == position) return null;
+		if(position === null) return this.referencePoint;
 		if(log) console.info(`Reference point changed: ${this.refposition} -> ${position}`);
 		switch(`${this.refposition}-${position}`) {
+			case "origo-origo":
+				return null;
 			case "origo-center":
 				throw new Error("Not implemented");
 				break;
 			case "origo-cornor":
 				this.context.translate(this.origoX, this.origoY);
 				break;
+			case "origo-custom":
+				this.context.translate(customref.x, customref.y);
+				this.customref = customref;
+				break;
 			case "center-origo":
 				throw new Error("Not implemented");
 				break;
+			case "center-center":
+				return null;
 			case "center-cornor":
+				throw new Error("Not implemented");
+				break;
+			case "center-custom":
 				throw new Error("Not implemented");
 				break;
 			case "cornor-origo":
@@ -175,8 +266,29 @@ export default class Graph {
 			case "cornor-center":
 				throw new Error("Not implemented");
 				break;
+			case "cornor-cornor":
+				return null;
+			case "cornor-custom":
+				this.context.translate(customref.x - this.origoX, customref.y - this.origoY);
+				this.customref = customref;
+				break;
+			case "custom-origo":
+				this.context.translate(-this.customref.x, -this.customref.y);
+				this.customref = null;
+				break;
+			case "custom-center":
+				throw new Error("Not implemented");
+				break;
+			case "custom-cornor":
+				this.context.translate(this.origoX - this.customref.x, this.origoY - this.customref.y);
+				this.customref = null;
+				break;
+			case "custom-custom":
+				this.context.translate(this.customref.x - customref.x, this.customref.y - customref.y);
+				this.customref = customref;
+				break;
 			default:
-				throw new Error("Invalid reference position");
+				throw new Error(`Unknown reference point: ${this.refposition} -> ${position}`);
 		}
 		const ref = this.refposition;
 		this.refposition = position;
@@ -185,18 +297,20 @@ export default class Graph {
 
 	/**
 	 * Draws a rectangle on the canvas
-	 * @param  {number} x - the x coordinate of the top left corner
-	 * @param  {number} y - the y coordinate of the top left corner
-	 * @param  {number} width - the width of the rectangle
-	 * @param  {number} height - the height of the rectangle
-	 * @param  {Style} style - the style
-	 * @param {"origo"|"center"|"cornor"} ref - the reference point
+	 * @param {number} x - the x coordinate of the top left cornor
+	 * @param {number} y - the y coordinate of the top left cornor
+	 * @param {number} width - the width of the rectangle
+	 * @param {number} height - the height of the rectangle
+	 * @param {Style} style - the style
+	 * @param {"origo"|"center"|"cornor"} pos - the reference point
+	 * @param {boolean} [scale=true] - use canvas scaling or absolute coordinates
 	 * @returns {Graph} this
 	 */
-	drawRect(x, y, width, height, style, ref = "origo") {
-		ref = this.reference(ref);
+	drawRect(x, y, width, height, style, pos = "origo", scale = true) {
+		const [{x: x1, y: y1}, {x: x2, y: y2}] = this.convertPoint(scale, x, y, width, height);
+		const ref = this.reference(pos);
 		style.apply(this.context);
-		this.context.fillRect(x, y, width, height);
+		this.context.fillRect(x1, y1, x2, y2);
 		this.context.stroke();
 		this.reference(ref);
 		return this;
@@ -204,19 +318,20 @@ export default class Graph {
 	
 	/**
 	 * Draws a circle on the canvas
-	 * @param  {number} x - the x coordinate of the center of the circle
-	 * @param  {number} y - the y coordinate of the center of the circle
-	 * @param  {number} radius - the radius of the circle
-	 * @param  {Style} style - the style
-	 * @param {"origo"|"center"|"cornor"} ref - the reference point
+	 * @param {number} x - the x coordinate of the center of the circle
+	 * @param {number} y - the y coordinate of the center of the circle
+	 * @param {number} radius - the radius of the circle
+	 * @param {Style} style - the style
+	 * @param {"origo"|"center"|"cornor"} pos - the reference point
+	 * @param {boolean} [scale=true] - use canvas scaling or absolute coordinates
 	 * @returns {Graph} this
 	 */
-	drawCircle(x, y, radius, style, ref = "origo") {
-		ref = this.reference(ref);
-		const {x: scaleX, y: scaleY} = this.getAxis();
+	drawCircle(x, y, radius, style, pos = "origo", scale = true) {
+		const [{x: cx, y: cy}, {x: rx, y: ry}] = this.convertPoint(scale, x, y, radius, radius);
+		const ref = this.reference(pos);
 		style.apply(this.context);
 		this.context.beginPath();
-		this.context.ellipse(x / scaleX, y / scaleY, radius / Math.abs(scaleX), radius / Math.abs(scaleY), 0, 0, 2 * Math.PI);
+		this.context.ellipse(cx, cy, Math.abs(rx), Math.abs(ry), 0, 0, 2 * Math.PI);
 		this.context.fill();
 		this.context.stroke();
 		this.reference(ref);
@@ -229,36 +344,37 @@ export default class Graph {
 	 * @param {number} y1 - the y coordinate of the first point
 	 * @param {number} x2 - the x coordinate of the second point
 	 * @param {number} y2 - the y coordinate of the second point
-	 * @param  {Style} style - the style
-	 * @param {"origo"|"center"|"cornor"} ref - the reference point
+	 * @param {Style} style - the style
+	 * @param {"origo"|"center"|"cornor"} pos - the reference point
+	 * @param {boolean} [scale=true] - match scaling or use absolute coordinates
 	 * @returns {Graph} this
 	 */
-	drawLine(x1, y1, x2, y2, style, ref = "origo") {
-		ref = this.reference(ref);
-		const {x: scaleX, y: scaleY} = this.getAxis();
+	drawLine(x1, y1, x2, y2, style, pos = "origo", scale = true) {
+		const [{x: ax, y: ay}, {x: bx, y: by}] = this.convertPoint(scale, x1, y1, x2, y2);
+		const ref = this.reference(pos);
 		style.apply(this.context);
 		this.context.beginPath();
-		this.context.moveTo(x1, y1);
-		this.context.lineTo(x2 / scaleX, y2 / scaleY);
+		this.context.moveTo(ax, ay);
+		this.context.lineTo(bx, by);
 		this.context.stroke();
-		this.context.closePath();
 		this.reference(ref);
 		return this;
 	}
 	
 	/**
 	 * Draw text on the canvas
-	 * @param  {string} text - the text to be drawn
-	 * @param  {number} x - the x coordinate of the top left corner of the text
-	 * @param  {number} y - the y coordinate of the top left corner of the text
-	 * @param  {Style} style - the style
+	 * @param {string} text - the text to be drawn
+	 * @param {number} x - the x coordinate of the top left cornor of the text
+	 * @param {number} y - the y coordinate of the top left cornor of the text
+	 * @param {Style} style - the style
 	 * @param {"origo"|"center"|"cornor"} ref - the reference point
 	 * @returns {Graph} this
 	 */
-	drawText(text, x, y, style, ref = "origo") {
-		ref = this.reference(ref);
+	drawText(text, x, y, style, pos = "origo", scale = false) {
+		const [{x: ax, y: ay}] = this.convertPoint(scale, x, y);
+		const ref = this.reference(pos);
 		style.apply(this.context);
-		this.context.fillText(text, x, y);
+		this.context.fillText(text, ax, ay);
 		this.reference(ref);
 		return this;
 	}
@@ -276,21 +392,22 @@ export default class Graph {
 
 	/**
 	 * Draws a point on the canvas
-	 * @param  {Coordinate} point - the point to be translated
-	 * @param  {Style} style - the style
+	 * @param {Coordinate} point - the point to be translated
+	 * @param {Style} style - the style
+	 * @param {"origo"|"center"|"cornor"} pos - the reference point
 	 * @returns {Graph} this
 	 */
-	drawPoint(point, style, ref = "origo") {
+	drawPoint(point, style, pos = "origo") {
 		if(!point instanceof Coordinate) return new Error("point is not of proper type");
-		ref = this.reference(ref);
+		const ref = this.reference(pos);
 		style.apply(this.context);
-		if(point instanceof Vector) { // Vector should be checked before Coordinate, because vector is extended from Coordinate
+		if(point instanceof PointVector) { // Vector should be checked before Coordinate, because vector is extended from Coordinate
 			const {x1, y1, x2, y2} = point.spacial();
-			this.drawCircle(x1, y1, 3, color);
-			this.drawCircle(x2, y2, 3, color);
+			this.drawCircle(x1, y1, 2, style);
+			this.drawCircle(x2, y2, 2, style);
 		} else if (point instanceof Coordinate) {
 			const {x, y} = point.getCoordinate()
-			this.drawCircle(x, y, 3, color);
+			this.drawCircle(x, y, 2, style);
 		}
 		this.reference(ref);
 	}
@@ -302,9 +419,9 @@ export default class Graph {
 	 * @param {"origo"|"center"|"cornor"} ref - the reference point
 	 * @returns {Graph} this
 	 */
-	drawVector(vector, style, ref = "origo") {
-		if(!(vector instanceof Vector)) return new Error("vector is not of proper type");
-		ref = this.reference(ref);
+	drawVector(vector, style, pos = "origo") {
+		if(!(vector instanceof PointVector)) return new Error("vector is not of proper type");
+		const ref = this.reference(pos);
 		const {x1, y1, x2, y2} = vector.spacial();
 		this.drawLine(x1, y1, x2, y2, style);
 		this.reference(ref);
@@ -352,8 +469,8 @@ export default class Graph {
 	/**
 	 * Draws an interactive button
 	 * @param {string} text - the text to be drawn
-	 * @param {number} x - the x coordinate of the top left corner of the button
-	 * @param {number} y - the y coordinate of the top left corner of the button
+	 * @param {number} x - the x coordinate of the top left cornor of the button
+	 * @param {number} y - the y coordinate of the top left cornor of the button
 	 * @param {number} width - the width of the button
 	 * @param {number} height - the height of the button
 	 * @param {Style} buttonstyle - the style
@@ -362,7 +479,7 @@ export default class Graph {
 	 * @returns {Graph} this
 	 */
 	drawButton(text, x, y, width, height, buttonstyle, textstyle, callback = () => {}) {
-		// rect with round corners
+		// rect with round cornors
 		button.apply(this.context);
 		this.context.beginPath();
 		this.context.moveTo(x + width / 2, y);
@@ -389,24 +506,28 @@ export default class Graph {
 	 */
 	plot(series, style) {
 		const ref = this.reference("origo");
-		const {x: scaleX, y: scaleY} = this.getAxis();
 		style.apply(this.context);
 
 		if(series instanceof FrequencyDomain) {
 			const {frequency, amplitude} = series.getSeries();
 			// Stick plot
 			for(let i = 0; i < frequency.length; i++) {
+				const [{x: x, y: y}] = this.convertPoint(true, frequency[i], amplitude[i]);
 				this.context.beginPath();
-				this.context.moveTo(frequency[i]/scaleX, 0);
-				this.context.lineTo(frequency[i]/scaleX, amplitude[i]/scaleY);
+				this.context.moveTo(x, 0);
+				this.context.lineTo(x, y);
 				this.context.stroke();
 			}
 		} else {
 			// One continous line
 			const {time, data} = series.getSeries();
+			const [{x: x, y: y}] = this.convertPoint(true, time[0], data[0]);
 			this.context.beginPath();
-			this.context.moveTo(time[0]/scaleX, data[0]/scaleY);
-			for(let i = 1; i < time.length; i++) this.context.lineTo(time[i]/scaleX, data[i]/scaleY);
+			this.context.moveTo(x, y);
+			for(let i = 1; i < time.length; i++) {
+				const [{x: x, y: y}] = this.convertPoint(true, time[i], data[i]);
+				this.context.lineTo(x, y);
+			}
 			this.context.stroke();
 		}
 		this.reference(ref);
@@ -427,88 +548,6 @@ export default class Graph {
 		this.context.moveTo(0, data[0]/scaleY);
 		for(let i = 1; i < data.length; i++) this.context.lineTo(i/scaleX, data[i]/scaleY);
 		this.context.stroke();
-		return this;
-	}
-	
-	/**
-	 * Draws axis with labels and optional numbering
-	 * @override
-	 * @param {number} intervalX - the interval between the marks on the x axis
-	 * @param {number} intervalY - the interval between the marks on the y axis
-	 * @param {Style} style - the style
-	 * @param {boolean} [numbering=true] - if true the marks will be numbered
-	 * @param {Style?} [gridStyle] - if given the grid will be drawn
-	 * @returns {Graph} this
-	 */
-	drawAxis(intervalX, intervalY, style, numbering = false, gridStyle = null) {
-		const ref = this.reference("origo");
-		if(gridStyle) this.drawGrid(intervalX, intervalY, gridStyle);
-		style.apply(this.context);
-		const {left, right, top, bottom} = this.getLimits(false);
-		const {x: scaleX, y: scaleY} = this.getAxis(true);
-		// determine the offset of the axis
-		let x, y;
-		switch(intervalX) {
-			case "left": x = left; break;
-			case "right": x = right; break;
-			case "center": x = 0; break;
-			default: x = intervalX * scaleX;
-		}
-		switch(intervalY) {
-			case "top": y = top; break;
-			case "bottom": y = bottom; break;
-			case "center": y = 0; break;
-			default: y = intervalY * scaleY;
-		}
-		this.context.beginPath();
-		this.context.moveTo(x, top);
-		this.context.lineTo(x, bottom);
-		this.context.moveTo(left, y);
-		this.context.lineTo(right, y);
-		
-		for(let i = 0; i <= right; i+=intervalX / scaleX) {
-			this.context.moveTo(i, y-5);
-			this.context.lineTo(i, y+5);
-		}
-		for(let i = 0; i >= left; i-=intervalX / scaleX) {
-			this.context.moveTo(i, y-5);
-			this.context.lineTo(i, y-5);
-		}
-		for(let i = 0; i <= bottom; i+=intervalY / scaleY) {
-			this.context.moveTo(x-5, i);
-			this.context.lineTo(x+5, i);
-		}
-		for(let i = 0; i >= top; i-=intervalY / scaleY) {
-			this.context.moveTo(x-5, i);
-			this.context.lineTo(x+5, i);
-		}
-
-		this.context.stroke();
-
-		if(numbering) {
-			const {left, right, top, bottom} = this.getLimits();
-			const {x: scaleX, y: scaleY} = this.getAxis();
-			
-			const x = Math.ceil(Math.min(left, right)/intervalX)*intervalX;
-			for(let i = x; i <= Math.max(left, right); i += intervalX) {
-				if (i === 0) continue; // Don't draw 0
-				this.context.save();
-				this.context.translate(i / scaleX, 0);
-				this.context.textAlign = "center";
-				this.context.fillText(`${i}${this.axis.x.unit}`, 0, -14);
-				this.context.restore();
-			}
-			const y = Math.ceil(Math.min(top, bottom)/intervalY)*intervalY;
-			for(let i = y; i <= Math.max(top, bottom); i += intervalY) {
-				if (i === 0) continue; // Don't draw 0
-				this.context.save();
-				this.context.translate(0, i / scaleY);
-				this.context.textAlign = "left";
-				this.context.fillText(`${i}${this.axis.y.unit}`, 10, 0);
-				this.context.restore();
-			}
-			this.reference(ref);
-		}
 		return this;
 	}
 

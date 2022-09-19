@@ -1,4 +1,4 @@
-import {listTrackerGenerator} from './functions.js';
+import {defaultWindowOptions, listTrackerGenerator} from './functions.js';
 import Layered from './layer.js';
 /**
  * Desktop class
@@ -14,19 +14,126 @@ export default class Desktop {
 	 * @property {Object<string, Layered>} windows - windows
 	 * @property {HTMLElement} element - desktop element
 	 * @property {GeneratorFunction} trackingid - incrementing number generator
+	 * @param {[Layered]} restoredWindows - windows to add to the desktop
+	 * @param {HTMLElement} hook - element to add the desktop to
 	 * @returns {Desktop}
 	 */
-	constructor(hook=document.body) {
-		const desktop = document.createElement("div");
-		desktop.id = "desktop";
-		hook.appendChild(desktop);
+	constructor(restoredWindows, hook=document.body) {
+		this.setupUI(hook);
 		/** @type {HTMLElement} */
 		this.element = document.getElementById("desktop");
 		/** @type {Object<string, Layered>} */
 		this.windows = {};
 		/** @type {listTrackerGenerator} */
 		this.trackingid = listTrackerGenerator();
+		// Add the windows to the desktop
+		if(restoredWindows) restoredWindows.forEach(w => this.createWindow(w, w.options));
 		return this;
+	}
+
+	/**
+	 * Sets up the UI such as context menu
+	 * @private
+	 * @param {HTMLElement} hook
+	 * @returns {void}
+	 */
+	setupUI(hook) {
+		const desktop = document.createElement("div");
+		desktop.id = "desktop";
+		const contextMenu = document.createElement("div");
+		contextMenu.id = "contextMenu";
+		contextMenu.style.display = "none";
+		contextMenu.style.position = "fixed";
+		contextMenu.style.zIndex = "1000";
+
+		// Create the context menu options
+		// Create the context header
+		const contextHeader = document.createElement("div");
+		contextHeader.classList.add("context-header");
+		contextHeader.innerText = "Context Menu";
+		contextMenu.appendChild(contextHeader);
+
+		// Add a window to the desktop
+		const addWindow = document.createElement("div");
+		addWindow.className = "add-window";
+		addWindow.innerHTML = "New Window";
+		addWindow.onclick = () => this.createWindow(prompt("Window Name"), defaultWindowOptions);
+		contextMenu.appendChild(addWindow);
+
+		// Open project properties
+		const openProjectProperties = document.createElement("div");
+		openProjectProperties.className = "open-project-properties";
+		openProjectProperties.innerHTML = "Project Properties";
+		openProjectProperties.onclick = () => {
+			// hide properties-window
+			document.getElementById("properties-window").style.display = "none";
+			// show properties-desktop
+			document.getElementById("properties-desktop").style.display = "block";
+		}
+		contextMenu.appendChild(openProjectProperties);
+
+		// Open window properties
+		const openWindowProperties = document.createElement("div");
+		openWindowProperties.className = "open-window-properties";
+		openWindowProperties.innerHTML = "Window Properties";
+		openWindowProperties.onclick = () => {
+			// hide properties-desktop
+			document.getElementById("properties-desktop").style.display = "none";
+			// create properties-window form
+			const propertiesWindow = document.getElementById("properties-window");
+			propertiesWindow.style.display = "block";
+		}
+		contextMenu.appendChild(openWindowProperties);
+
+		// Save as
+		const saveAs = document.createElement("div");
+		saveAs.className = "save-as";
+		saveAs.innerHTML = "Save As";
+		saveAs.onclick = () => this.createWindow("Save As", defaultWindowOptions);
+		contextMenu.appendChild(saveAs);
+
+		desktop.addEventListener("contextmenu", (e) => {
+			e.preventDefault();
+			contextMenu.style.left = e.clientX + "px";
+			contextMenu.style.top = e.clientY + "px";
+			// get all parents until desktop
+			if(e.target.id === "desktop") this.updateContextMenu();
+			else this.updateWindowContextMenu(e);
+			contextMenu.style.display = "block";
+		});
+		desktop.addEventListener("click", () => contextMenu.style.display = "none");
+		desktop.appendChild(contextMenu);
+		hook.appendChild(desktop);
+	}
+
+	/**
+	 * Update and show the context menu for desktop
+	 * @returns {void}
+	 */
+	updateContextMenu() {
+		const contextMenu = document.getElementById("contextMenu");
+		contextMenu.style.display = "block";
+		// Set the clickable options
+		// loop through all context options make first 2 visible
+		for(let i = 1; i < contextMenu.children.length; i++)
+			if(i < 3) contextMenu.children[i].style.display = "block";
+			else contextMenu.children[i].style.display = "none";
+	}
+
+	/**
+	 * Update and show the context menu for a window
+	 * @param {MouseEvent} e
+	 * @returns {void}
+	 */
+	updateWindowContextMenu(e) {
+		const contextMenu = document.getElementById("contextMenu");
+		let w = e.target;
+		// Ensure that the window is the target, not sub elements
+		while(!w.classList.contains("window")) w = w.parentElement;
+		// loop through all context options make first 2 hidden
+		for(let i = 1; i < contextMenu.children.length; i++)
+			if(i < 3) contextMenu.children[i].style.display = "none";
+			else contextMenu.children[i].style.display = "block";
 	}
 
 	/**
@@ -88,7 +195,13 @@ export default class Desktop {
 	 * @returns {{string: Layered}}
 	 */
 	createWindow(name, options) {
-		if(this.windows[name]) throw new Error(`Window ${name} already exists`);
+		let restoredWindow = null;
+		if(name instanceof Layered){
+			restoredWindow = name;
+			name = restoredWindow.name;
+			delete restoredWindow.name;
+		}
+		else if(this.windows[name]) return Error(`Window ${name} already exists`);
 		const w = document.createElement("div");
 		w.classList.add("window");
 		const id = this.trackingid.next().value.number;
@@ -117,8 +230,12 @@ export default class Desktop {
 
 		w.appendChild(wHeader);
 		w.appendChild(wBody);
-			
-		this.windows[name] = new Layered(wBody, options);
+		
+		if(restoredWindow) {
+			this.windows[name] = restoredWindow;
+			this.windows[name].htmlhook = wBody
+		}
+		else this.windows[name] = new Layered(wBody, options);
 		this.element.appendChild(w);
 
 		this.updateListeners(name);
@@ -183,6 +300,7 @@ export default class Desktop {
 	 */
 	call(func) {
 		Object.keys(this.windows).forEach(key => {
+			console.log(key);
 			func(this.windows[key]);
 		});
 	}

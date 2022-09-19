@@ -166,7 +166,7 @@ function sum(callback, start, end, intermitent = false) {
  * @param {number} rad - Radian value
  * @returns {number} number
  */
-function radToDeg(rad) {
+export function radToDeg(rad) {
 	return rad * 180 / Math.PI;
 }
 
@@ -175,6 +175,6 @@ function radToDeg(rad) {
  * @param {number} deg - Degree value
  * @returns {number} number
  */
-function degToRad(deg) {
+export function degToRad(deg) {
 	return deg * Math.PI / 180;
 }

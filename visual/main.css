@@ -1,6 +1,98 @@
-/* css variables */
+/* import fonts */
+@font-face {
+	font-family: 'Source Sans 3';
+	src: url('SourceSans3-VariableFont_wght.ttf.css') format('truetype'),
+		 url('SourceSans3-Italic-VariableFont_wght.ttf.css') format('truetype');
+}
+
+/* CSS Variables
+ * Codes
+ * -c: color
+ *   f: foreground
+ *   b: background
+ * -f: font
+ *   m: family name only
+ *   s: size only
+ * -s: size/spacing (width/height/etc)
+ *   p: padding
+ *   m: margin
+ *   b: border
+ * -
+ */
 :root {
-	--menu-height: 50px;
+	--menu-s-height: 50px;
+}
+
+:root body[data-theme="hacker"] {
+	--primary-cf: #eaeaea;
+	--primary-cb: #1d1d1d;
+	--primary-f: small-caps 24px/1.5 "Source Sans 3", sans-serif;
+
+	--secondary-cf: #00a57f;
+	--secondary-cb: #242424;
+	--secondary-f: italic 600 20px/1.25 "Source Sans 3", sans-serif;
+
+	--tertiary-cf: #ffffff;
+	--tertiary-cb: #525252;
+	--tertiary-f: normal 18px/1.25 "Source Sans 3", sans-serif;
+}
+
+:root body[data-theme="mint"] {
+	--primary-cf: #00505e;
+	--primary-cb: #ffffff;
+	--primary-f: small-caps 24px/1.5 "Source Sans 3", sans-serif;
+
+	--secondary-cf: #00b1c1;
+	--secondary-cb: #f0f0f0;
+	--secondary-f: italic 600 20px/1.25 "Source Sans 3", sans-serif;
+
+	--tertiary-cf: #000000;
+	--tertiary-cb: #ededed;
+	--tertiary-f: normal 18px/1.25 "Source Sans 3", sans-serif;
+}
+
+:root body[data-theme="pink"] {
+	--primary-cf: #37003d;
+	--primary-cb: #ffffff;
+	--primary-f: small-caps 24px/1.5 "Source Sans 3", sans-serif;
+
+	--secondary-cf: #d20090;
+	--secondary-cb: #f0f0f0;
+	--secondary-f: italic 600 20px/1.25 "Source Sans 3", sans-serif;
+
+	--tertiary-cf: #1b1b1b;
+	--tertiary-cb: #adadad;
+	--tertiary-f: normal 18px/1.25 "Source Sans 3", sans-serif;
+}
+
+:root body[data-theme="monochrome"] {
+	--primary-cf: #ffffff;
+	--primary-cb: #333333;
+	--primary-f: small-caps 24px/1.5 "Source Sans 3", sans-serif;
+
+	--secondary-cf: #1d1d1d;
+	--secondary-cb: #7e7e7e;
+	--secondary-f: italic 600 20px/1.25 "Source Sans 3", sans-serif;
+
+	--tertiary-cf: #d4d4d4;
+	--tertiary-cb: #000000;
+	--tertiary-f: normal 18px/1.25 "Source Sans 3", sans-serif;
+}
+
+:root body[data-theme="retro"] {
+	/* Brown 80 eletronics retro colors */
+	--primary-cf: #342927;
+	--primary-cb: #d3c0a6;
+	--primary-f: italic small-caps 400 24px/1.5 "MuseoModerno";
+
+	--secondary-cf: #786658;
+	--secondary-cb: #b8a491;
+	--secondary-f: italic 300 16px/1.25 "MuseoModerno";
+
+	--tertiary-cf: #342927;
+	--tertiary-cb: #9cdac0;
+	--tertiary-f: italic 300 16px/1.25 "MuseoModerno";
+
 }
 
 body {
@@ -9,9 +101,12 @@ body {
 	width: 100vw;
 	height: 100vh;
 	overflow: hidden;
+	font: var(--tertiary-f);
+	background-color: var(--primary-cb);
+	color: var(--primary-cf);
 }
 
-body[data-theme="dark"] {
-	background-color: #1d1d1d;
-	color: #eaeaea;
+a:link, a:visited {
+	color: inherit;
+	text-decoration: none;
 }

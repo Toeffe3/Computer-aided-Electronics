@@ -1,0 +1,169 @@
+body[data-layout="modern"] {
+	display: grid;
+	grid-template-areas: "menu menu" "desktop properties";
+	grid-template-rows: var(--menu-s-height) 1fr;
+	grid-template-columns: 1fr min-content;
+}
+
+body[data-layout="modern"] #contextMenu {
+	display: grid;
+	grid-template-rows: 35px repeat(auto-fill, 1fr);
+	grid-template-columns: 1;
+	border: 3px solid var(--secondary-cf);
+	width: 200px;
+}
+
+body[data-layout="modern"] #contextMenu .context-header {
+	grid-row: 1;
+	grid-column: 1;
+	background: var(--secondary-cf);
+	color: var(--secondary-cb);
+	font: var(--primary-f);
+	text-align: center;
+}
+
+body[data-layout="modern"] #contextMenu > div {
+	width: 100%;
+	height: 100%;
+	padding: 5px 10px;
+	box-sizing: border-box;
+	font: var(--tertiary-f);
+}
+
+body[data-layout="modern"] #contextMenu > div:hover {
+	background: var(--secondary-cf);
+	color: var(--secondary-cb);
+}
+
+body[data-layout="modern"] #menu {
+	grid-area: menu;
+	display: flex;
+	height: 100%;
+	width: 100%;
+	box-sizing: border-box;
+	background: var(--secondary-cf);
+	font: var(--primary-f);
+	color: var(--secondary-cb);
+}
+
+body[data-layout="modern"] #menu div {
+	margin: auto 0;
+}
+
+body[data-layout="modern"] #menu .item h5 {
+	margin: 0;
+	width: 150px;
+	text-align: center;
+}
+
+body[data-layout="modern"] #menu .filler {
+	width: 100%;
+	height: 100%;
+}
+
+body[data-layout="modern"] #property {
+	grid-area: properties;
+	background: var(--secondary-cf);
+	width: 300px;
+}
+
+body[data-layout="modern"] #property .header {
+	color: var(--primary-cf);
+	font: var(--primary-f);
+	text-align: center;
+}
+
+body[data-layout="modern"] #property .contents > div {
+	width: calc(100% - 40px);
+	height: 300px;
+	padding: 20px;
+	display: grid;
+	grid-template-rows: repeat(auto-fit, 60px);
+	grid-template-columns: min-content auto;
+	font: var(--tertiary-f);
+}
+
+body[data-layout="modern"] #property .contents label {
+	display: flex;
+	align-items: center;
+}
+
+body[data-layout="modern"] #property .contents input,
+body[data-layout="modern"] #property .contents select {
+	height: 30px;
+	margin: auto 10px;
+}
+
+body[data-layout="modern"] #property .contents div > div {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: row;
+	margin: auto 0;
+}
+
+body[data-layout="modern"] #property .contents div > div label {
+	/* Label should be on the input field */
+	position: relative;
+	top: -11px;
+	left: 7px;
+	/* Do not take up space */
+	width: 0;
+	height: 0;
+	white-space: pre;
+	font-size: x-small;
+	color: var(--secondary-cb);
+}
+
+body[data-layout="modern"] #property .contents div > div input {
+	width: 75px;
+	margin: 0 2.5px;
+}
+
+body[data-layout="modern"] #desktop {
+	grid-area: desktop;
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	position: relative;
+}
+
+body[data-layout="modern"] #desktop .window {
+	position: absolute;
+	color: var(--secondary-cf);
+	border: 3px solid var(--secondary-cb);
+}
+
+body[data-layout="modern"] #desktop .window .window-header {
+	margin: 0;
+	background: var(--secondary-color);
+	display: flex;
+	height: 30px;
+}
+
+body[data-layout="modern"] #desktop .window .window-header h3 {
+	font: var(--secondary-f);
+	margin: auto auto auto 5px;
+}
+
+body[data-layout="modern"] #desktop .window .window-header-button {
+	padding: 5px 8px;
+	height: 20px;
+}
+
+body[data-layout="modern"] #desktop .window .window-header-button-close:hover {
+	background: red;
+}
+
+body[data-layout="modern"] #desktop .window .window-body {
+	overflow: hidden;
+	width: 100%;
+	height: calc(100% - 30px);
+	position: absolute;
+}
+
+body[data-layout="modern"] #desktop .window .window-body canvas {
+	position: absolute;
+	left: 0;
+	top: 0;
+}

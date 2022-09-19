@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "ws --cors.origin *",
+    "start": "ws --config-file lws.config.js",
     "documenation": "cd docs/ && echo>index.html && del *.html && cd .. && jsdoc -c ./jsdoc.json -r . && start docs/index.html"
   },
   "author": "Toeffe3",
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "jsdoc-export-default-interop": "^0.3.1",
-    "local-web-server": "^5.2.1"
+    "local-web-server": "^5.2.1",
+    "lz-string": "^1.4.4"
   }
 }

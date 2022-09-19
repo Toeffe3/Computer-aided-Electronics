@@ -1,3 +1,4 @@
+import Coordinate from './coordinate.js';
 import PointVector from './pointvector.js';
 /**
  * Kinematic class
@@ -247,12 +248,12 @@ export default class Kinematic {
 	/**
 	 * Draw the kinematic
 	 * @param {Graph} canvas - the canvas class to draw on
-	 * @param {string} [color='#0000FFFF'] - the color of the kinematic
+	 * @param {Style} style - the color of the kinematic
 	 * @returns {Kinematic} this
 	 */
-	draw(canvas, color='#0000FFFF') {
+	draw(canvas, style) {
 		this.update();
-		for(let name in this.vectors) canvas.drawVector(this.vectors[name], color);
+		for(let name in this.vectors) canvas.drawVector(this.vectors[name], style, "origo");
 		return this;
 	}
 	

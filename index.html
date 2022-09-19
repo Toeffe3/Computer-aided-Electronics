@@ -6,27 +6,110 @@
 		<meta name="description" content="">
 		<meta name="author" content="">
 		<title>CAE</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
 		
 		<link rel="stylesheet" href="visual/main.css">
-		<link rel="stylesheet" href="visual/themes/modern.css">
+		<link rel="stylesheet" href="visual/layouts/modern.css">
+
+		<script src="node_modules/lz-string/libs/lz-string.min.js"></script>
 
 		<script type="module" src="program.js"></script>
 	</head>
-	<body data-theme="dark" data-layout="moderen">
+	<body>
 		<div id="menu" class="panel">
 			<div class="menu item">
 				<h5>New Project</h5>
 			</div>
 			<div class="menu item">
-				<h5>New Window</h5>
+				<h5>Save Project</h5>
 			</div>
 			<div class="menu filler"></div>
 			<div class="menu item">
-				<h5>Documentation</h5>
+				<a href="docs/">
+					<h5>Documentation</h5>
+				</a>
 			</div>
 			<div class="menu item">
 				<h5>About</h5>
 			</div>
 		</div>
+		<div id="property" class="panel">
+			<div class="header">
+				<h5>Properties</h5>
+			</div>
+			<div class="contents">
+				<div id="properties-desktop">
+					<label for="theme">Theme</label>
+					<!-- List of availabe themes -->
+					<select id="theme" name="theme" autocomplete="off">
+						<option value="hacker">Hacker</option>
+						<option value="mint">Mint</option>
+						<option value="pink">Pink</option>
+						<option value="monochrome">Monochrome</option>
+						<option value="retro">Retro eletronics</option>
+					</select>
+					<label for="layout">Layout</label>
+					<!-- List of availabe layouts -->
+					<select id="layout" name="layout" autocomplete="off">
+						<option value="modern" selected>Modern</option>
+					</select>
+				</div>
+				<div id="properties-window">
+					<label for="closeable">Closeable</label>
+					<input type="checkbox" id="closeable" name="closeable" autocomplete="off">
+					<label for="resizeable">Resizeable</label>
+					<input type="checkbox" id="resizeable" name="resizeable" autocomplete="off">
+					<label for="movable">Movable</label>
+					<input type="checkbox" id="movable" name="movable" autocomplete="off">
+					<label for="position">Position</label>
+					<div id="position">
+						<label for="x">X coord:</label>
+						<input type="number" id="x" name="x" autocomplete="off">
+						<label for="y">Y coord:</label>
+						<input type="number" id="y" name="y" autocomplete="off">
+					</div>
+					<label for="size">Size</label>
+					<div id="size">
+						<label for="width">Width:</label>
+						<input type="number" id="width" name="width" autocomplete="off">
+						<label for="height">Height:</label>
+						<input type="number" id="height" name="height" autocomplete="off">
+					</div>
+				</div>
+				<div id="properties-graph">
+
+				</div>
+		</div>
+		<script type="module">
+			import store from "./modules/appdata.js";
+			const themeSelect = document.querySelector("#theme");
+			const layoutSelect = document.querySelector("#layout");
+
+			// get the theme and layout from the appdata
+			let theme = store.visual("theme");
+			let layout = store.visual("layout");
+			document.body.dataset.theme = theme;
+			document.body.dataset.layout = layout;
+			Array.from(themeSelect.children).some((option) => option.value===theme?option.selected=true:false);
+			Array.from(layoutSelect.children).some((option) => option.value===layout?option.selected=true:false);
+
+			// Update the theme and layout
+			themeSelect.addEventListener("change", function() {
+				document.body.dataset.theme = this.value;
+				store.visual("theme", this.value);
+				// invoke onresize to update the theme
+				window.dispatchEvent(new Event("resize"));
+			});
+			layoutSelect.addEventListener("change", function() {
+				document.body.dataset.layout = this.value;
+				store.visual("layout", this.value);
+				// invoke onresize to update the layout
+				window.dispatchEvent(new Event("resize"));
+			});
+			
+		</script>
 	</body>
 </html>

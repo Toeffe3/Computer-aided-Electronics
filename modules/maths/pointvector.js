@@ -1,4 +1,4 @@
-import Coordinate from './coordinate';
+import Coordinate from './coordinate.js';
 /** 
  * Vector class
  * @description Ecluidean vector is of magnitude and angle, not a matrix vector
@@ -62,7 +62,7 @@ export default class PointVector extends Coordinate {
 	/**
 	 * Get the coordinate this vector points to
 	 * @override
-	 * @returns {{x, y}} {x, y}
+	 * @returns {{x: number, y: number}}
 	 */
 	getCoordinate() {
 		return this.getPoint().getCoordinate();
@@ -279,7 +279,7 @@ export default class PointVector extends Coordinate {
 	}
 	/**
 	 * Get spacial coordinates of this vector
-	 * @returns {Coordinate} Coordinates
+	 * @returns {{x1: number, y1: number, x2: number, y2: number}}
 	 */
 	spacial() {
 		return {

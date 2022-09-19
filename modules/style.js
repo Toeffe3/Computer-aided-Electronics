@@ -33,20 +33,14 @@ export default class Style {
 		};
 		/** @type {StyleText} */
 		this.text = {
-			/** @type {number} */
-			size: 10,
 			/** @type {string} */
-			family: "Arial",
+			font: "normal normal 400 10px/1 Arial",
 			/** @type {"center"|"left"|"right"} */
 			align: "center",
 			/** @type {"middle"|"top"|"bottom"} */
 			baseline: "middle",
 			/** @type {"left"|"right"|"inherit"} */
 			direction: "inherit",
-			/** @type {"normal"|"italic"|"oblique"} */
-			style: "normal",
-			/** @type {"normal"|"bold"|"bolder"|"lighter"|"100"|"200"|"300"|"400"|"500"|"600"|"700"|"800"|"900"} */
-			weight: "normal",
 		}
 
 		/** @type {gradientList} */
@@ -199,7 +193,7 @@ export default class Style {
 		ctx.shadowOffsetY = this.shadow.offsetY;
 		ctx.globalAlpha = this.globalAlpha;
 		ctx.globalCompositeOperation = this.globalCompositeOperation;
-		ctx.font = this.text.size + "px " + this.text.family;
+		ctx.font = this.text.font;
 		ctx.textAlign = this.text.align;
 		ctx.textBaseline = this.text.baseline;
 		ctx.direction = this.text.direction;
@@ -210,14 +204,27 @@ export default class Style {
 	 * Set the text style
 	 * @param {number} [size=10] - the text size
 	 * @param {string} [family="Arial"] - the text family
+	 * @param {string} [weight="400"] - the text weight
+	 * @param {string} [style="normal"] - the text style
+	 * @param {string} [variant="normal"] - the text variant
+	 * @param {number} [lineHeight="normal"] - the text line height
+	 * @returns {Style} this
+	 */
+	 setText(size = 10, family = "Arial", weight = "400", style = "normal", variant = "normal", lineHeight = 1) {
+		// if size === null use family to set font
+		if(size === null) this.text.font = family;
+		else this.text.font = `${style} ${variant} ${weight} ${size}px/${lineHeight} ${family}`;
+		return this;
+	}
+
+	/**
+	 * Set position of text
 	 * @param {string} [align="center"] - the text align
 	 * @param {string} [baseline="middle"] - the text baseline
 	 * @param {string} [direction="inherit"] - the text direction
 	 * @returns {Style} this
 	 */
-	 setText(size = 10, family = "Arial", align = "center", baseline = "middle", direction = "inherit") {
-		this.text.size = size;
-		this.text.family = family;
+	setTextPosition(align = "center", baseline = "middle", direction = "inherit") {
 		this.text.align = align;
 		this.text.baseline = baseline;
 		this.text.direction = direction;
