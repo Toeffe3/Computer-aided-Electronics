@@ -1,5 +1,6 @@
 import {defaultWindowOptions, listTrackerGenerator} from './functions.js';
 import Layered from './layer.js';
+import store from "./appdata.js";
 /**
  * Desktop class
  * @description The desktop class is used to create and manage multiple windows for a graphical user interface (GUI).
@@ -53,6 +54,8 @@ export default class Desktop {
 		contextHeader.innerText = "Context Menu";
 		contextMenu.appendChild(contextHeader);
 
+		//-------------------- Desktop Menu Options --------------------//
+
 		// Add a window to the desktop
 		const addWindow = document.createElement("div");
 		addWindow.className = "add-window";
@@ -68,9 +71,11 @@ export default class Desktop {
 			// hide properties-window
 			document.getElementById("properties-window").style.display = "none";
 			// show properties-desktop
-			document.getElementById("properties-desktop").style.display = "block";
+			document.getElementById("properties-desktop").style.display = "grid";
 		}
 		contextMenu.appendChild(openProjectProperties);
+
+		//-------------------- Window Context Menu --------------------//
 
 		// Open window properties
 		const openWindowProperties = document.createElement("div");
@@ -81,7 +86,7 @@ export default class Desktop {
 			document.getElementById("properties-desktop").style.display = "none";
 			// create properties-window form
 			const propertiesWindow = document.getElementById("properties-window");
-			propertiesWindow.style.display = "block";
+			propertiesWindow.style.display = "grid";
 		}
 		contextMenu.appendChild(openWindowProperties);
 
@@ -89,7 +94,9 @@ export default class Desktop {
 		const saveAs = document.createElement("div");
 		saveAs.className = "save-as";
 		saveAs.innerHTML = "Save As";
-		saveAs.onclick = () => this.createWindow("Save As", defaultWindowOptions);
+		saveAs.onclick = () => {
+			// Implement on updateWindowContextMenu
+		}
 		contextMenu.appendChild(saveAs);
 
 		desktop.addEventListener("contextmenu", (e) => {
@@ -113,6 +120,7 @@ export default class Desktop {
 	updateContextMenu() {
 		const contextMenu = document.getElementById("contextMenu");
 		contextMenu.style.display = "block";
+		contextMenu.children[0].innerText = "Desktop";
 		// Set the clickable options
 		// loop through all context options make first 2 visible
 		for(let i = 1; i < contextMenu.children.length; i++)
@@ -127,9 +135,22 @@ export default class Desktop {
 	 */
 	updateWindowContextMenu(e) {
 		const contextMenu = document.getElementById("contextMenu");
+		contextMenu.style.display = "block";
+		contextMenu.children[0].innerText = "Window";
 		let w = e.target;
 		// Ensure that the window is the target, not sub elements
 		while(!w.classList.contains("window")) w = w.parentElement;
+		// Set the save as function
+		contextMenu.children[4].onclick = () => {
+			this.getLayer(w.children[0].children[0].innerHTML).saveAs(`image/${store.user("saveAsExtension")}`).then((image) => {
+				console.log(image.type, store.user("saveAsExtension"));
+				const link = document.createElement("a");
+				link.href = URL.createObjectURL(image);
+				link.download = `${w.children[0].children[0].innerHTML}.${store.user("saveAsExtension")}`;
+				console.log(image.type, store.user("saveAsExtension"));
+				link.click();
+			});
+		}
 		// loop through all context options make first 2 hidden
 		for(let i = 1; i < contextMenu.children.length; i++)
 			if(i < 3) contextMenu.children[i].style.display = "none";

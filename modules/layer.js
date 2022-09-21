@@ -90,4 +90,20 @@ export default class Layered {
 		return this;
 	}
 	
+	/**
+	 * Save the layers in one
+	 * @param {string} type - the mime type of the image
+	 * @returns {Promise<Blob>} the file
+	 */
+	saveAs(type) {
+		return new Promise((resolve, reject) => {
+			const canvas = document.createElement("canvas");
+			const ctx = canvas.getContext("2d");
+			canvas.width = this.options.width;
+			canvas.height = this.options.height;
+			this.call(layer => ctx.drawImage(layer.canvas, 0, 0));
+			console.log(type);
+			canvas.toBlob(resolve, `${type}`);
+		});
+	}
 }

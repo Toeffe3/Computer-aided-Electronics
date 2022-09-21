@@ -28,6 +28,7 @@ body[data-layout="modern"] #contextMenu > div {
 	padding: 5px 10px;
 	box-sizing: border-box;
 	font: var(--tertiary-f);
+	background: var(--primary-cb);
 }
 
 body[data-layout="modern"] #contextMenu > div:hover {
@@ -77,7 +78,7 @@ body[data-layout="modern"] #property .contents > div {
 	width: calc(100% - 40px);
 	height: 300px;
 	padding: 20px;
-	display: grid;
+	/* display: grid; */  /* Set dynamically */
 	grid-template-rows: repeat(auto-fit, 60px);
 	grid-template-columns: min-content auto;
 	font: var(--tertiary-f);

@@ -1,9 +1,9 @@
 import Layered from './layer.js';
-import Graph from './graph.js';
 class AppData {
     constructor() {
         this.appData = {
             version: '0.0.1',
+            project: 'example',
             visual: {
                 theme: 'hacker',
                 layout: 'modern',
@@ -11,10 +11,15 @@ class AppData {
             user: {
                 language: 'en',
                 latestProject: 'example',
+                saveAsExtension: 'png',
             },
-            desktop: {
-                windows: {},
-            },
+            projects: {
+                example: {
+                    desktop: {
+                        windows: {},
+                    },
+                }
+            }
         };
 
         // if no appData exists, create it
@@ -64,7 +69,7 @@ class AppData {
             serilized.layers[layer] = object;
         };
         console.log(serilized);
-        this.appData.desktop.windows[window.htmlhook.parentElement.children[0].children[0].innerText] = LZString.compressToUTF16(JSON.stringify(serilized));
+        this.appData.projects[this.appData.project].desktop.windows[window.htmlhook.parentElement.children[0].children[0].innerText] = LZString.compressToUTF16(JSON.stringify(serilized));
         console.log(this);
         localStorage.setItem('appData', JSON.stringify(this.appData));
         return this;
@@ -76,7 +81,7 @@ class AppData {
      * @returns {Window}
      */
     restoreWindow(name) {
-        let windowData = JSON.parse(LZString.decompressFromUTF16(this.appData.desktop.windows[name]));
+        let windowData = JSON.parse(LZString.decompressFromUTF16(this.appData.projects[this.appData.project].desktop.windows[name]));
         let window = new Layered(windowData.htmlhook);
         Object.assign(window, windowData);
         window.name = name;
@@ -89,7 +94,7 @@ class AppData {
      */
     restoreWindows() {
         let windows = [];
-        for(let window of Object.keys(this.appData.desktop.windows)) {
+        for(let window of Object.keys(this.appData.projects[this.appData.project].desktop.windows)) {
             windows.push(this.restoreWindow(window));
         };
         return windows;

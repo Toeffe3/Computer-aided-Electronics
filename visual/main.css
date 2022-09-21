@@ -110,3 +110,7 @@ a:link, a:visited {
 	color: inherit;
 	text-decoration: none;
 }
+
+#property .contents > div {
+	display: none;
+}

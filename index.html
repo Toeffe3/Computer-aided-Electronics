@@ -10,6 +10,9 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
+
+		<!-- icon -->
+		<link rel="icon" href="visual/CAE.png" type="image/x-icon" />
 		
 		<link rel="stylesheet" href="visual/main.css">
 		<link rel="stylesheet" href="visual/layouts/modern.css">
@@ -56,6 +59,12 @@
 					<select id="layout" name="layout" autocomplete="off">
 						<option value="modern" selected>Modern</option>
 					</select>
+					<label for="extension">Save as</label>
+					<!-- Save as extension -->
+					<select id="extension" name="extension" autocomplete="off">
+						<option value="png">PNG</option>
+						<option value="jpeg">JPEG</option>
+					</select>
 				</div>
 				<div id="properties-window">
 					<label for="closeable">Closeable</label>
@@ -87,15 +96,18 @@
 			import store from "./modules/appdata.js";
 			const themeSelect = document.querySelector("#theme");
 			const layoutSelect = document.querySelector("#layout");
+			const extensionSelect = document.querySelector("#extension");
 
 			// get the theme and layout from the appdata
 			let theme = store.visual("theme");
 			let layout = store.visual("layout");
+			let extension = store.user("saveAsExtension");
 			document.body.dataset.theme = theme;
 			document.body.dataset.layout = layout;
+			document.body.dataset.extension = extension;
 			Array.from(themeSelect.children).some((option) => option.value===theme?option.selected=true:false);
 			Array.from(layoutSelect.children).some((option) => option.value===layout?option.selected=true:false);
-
+			Array.from(extensionSelect.children).some((option) => option.value===extension?option.selected=true:false);
 			// Update the theme and layout
 			themeSelect.addEventListener("change", function() {
 				document.body.dataset.theme = this.value;
@@ -108,6 +120,10 @@
 				store.visual("layout", this.value);
 				// invoke onresize to update the layout
 				window.dispatchEvent(new Event("resize"));
+			});
+			extensionSelect.addEventListener("change", function() {
+				document.body.dataset.extension = this.value;
+				store.user("saveAsExtension", this.value);
 			});
 			
 		</script>
