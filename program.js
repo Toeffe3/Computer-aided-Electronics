@@ -5,7 +5,8 @@ import Style from './modules/style.js';
 import Graph from './modules/graph.js';
 import Series from './modules/maths/series.js';
 import store from './modules/appdata.js';
-
+import BooleanExpression, {booleanOperators} from './modules/eletronics/logic.js';
+const {and, or, xor, nand, nor, xnor, not} = booleanOperators;
 /** @typedef {'import ("./modules/typedefs.js")'} Types' */
 
 const checkCSS = (name) => `${name}`.match(/^--/) ? getComputedStyle(document.body).getPropertyValue(name) : name;
@@ -46,10 +47,12 @@ const highSampleSignal = Series.sineWave(0.053, 4.4, 1, 240, 0).cast("TimeDomain
 
 
 const desktop = new Desktop(store.restoreWindows());
+export default desktop;
 
 // desktop.createWindow("TimeDomain", { ...defaultWindowOptions, origoX: 0, origoY: -200, height: 490, position: { x: 0, y: 0 } });
 // desktop.createWindow("FreqencyDomain", { ...defaultWindowOptions, origoX: -335, origoY: -600, height: 600, width: 670, position: { x: 400, y: 0 } });
 // desktop.createWindow("Debug window", { ...defaultWindowOptions, height: 80, position: { x: 0, y: 520 } });
+// desktop.createWindow("Logic calculator", { ...defaultWindowOptions, height: 400, width: 400, position: { x: 0, y: 0 } });
 
 desktop.callOn(TimeDomain => {
 	TimeDomain.addLayer("background"); // static background
@@ -72,7 +75,51 @@ desktop.callOn(DebugWindow => {
 	DebugWindow.addLayer("foreground"); // updateable foreground
 }, "Debug window");
 
+const lc = desktop.getWindow("Logic calculator");
+const inp = document.createElement("input");
+const out = document.createElement("table");
+
+inp.type = "text";
+const updateLogic = (e) => {
+	let boolx = BooleanExpression.parse(e.target.value);
+	const tbl = document.createElement("table");
+	// console.table to html table
+	boolx.simplify();
+	boolx.truthTable().forEach((row, i) => {
+		if(i === 0) {
+			const thr = document.createElement("tr");
+			Object.keys(row).forEach((cell, j) => {
+				const th = document.createElement("th");
+				th.innerText = cell;
+				thr.appendChild(th);
+			});
+			tbl.appendChild(thr);
+		}
+		const tr = document.createElement("tr");
+		Object.values(row).forEach((cell, j) => {
+			const td = document.createElement("td");
+			td.innerText = cell;
+			tr.appendChild(td);
+		});
+		tbl.appendChild(tr);
+	});
+	out.innerHTML = "";
+	out.appendChild(tbl);
+};
+inp.oninput = updateLogic;
+inp.onchange = updateLogic;
+lc.children[1].appendChild(inp);
+lc.children[1].appendChild(out);
+
 let pos = 0;
+
+// runtime ms to hh:mm:ss
+const msToTimeString = (ms) => {
+	const s = Math.floor(ms / 1000);
+	const m = Math.floor(s / 60);
+	const h = Math.floor(m / 60);
+	return `${h.toString().padStart(2, "0")}:${(m % 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
+};
 
 const program = loop(status => {
 	const { frame, fps, time } = status;
@@ -99,7 +146,7 @@ const program = loop(status => {
 		DebugWindow.callOn(forground => {
 			forground.clear();
 			forground.drawText(
-				`runtime: ${Math.floor(time / 1000 / 60)}:${Math.floor(time / 1000) % 60}:${(time % 1000).toString().padStart(3, "0")}`,
+				`runtime: ${msToTimeString(time)}`,
 				0, 10,
 				styles.text(),
 				"cornor",
