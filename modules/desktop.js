@@ -15,7 +15,7 @@ export default class Desktop {
 	 * @property {Object<string, Layered>} windows - windows
 	 * @property {HTMLElement} element - desktop element
 	 * @property {GeneratorFunction} trackingid - incrementing number generator
-	 * @param {[Layered]} restoredWindows - windows to add to the desktop
+	 * @param {Array<Layered>} restoredWindows - windows to add to the desktop
 	 * @param {HTMLElement} hook - element to add the desktop to
 	 * @returns {Desktop}
 	 */

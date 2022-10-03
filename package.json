@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "ws --config-file lws.config.js",
-    "documenation": "cd docs/ && echo>index.html && del *.html && cd .. && jsdoc -c ./jsdoc.json -r . && start docs/index.html"
+    "documenation": "cd docs/ && echo>index.html && del *.html && cd .. && jsdoc -c ./jsdoc.json -r . && start docs/index.html",
+    "docs": "cd docs/ && echo>index.html && rm *.html && cd .. && jsdoc -c ./jsdoc.json -r ."
   },
   "author": "Toeffe3",
   "license": "ISC",
