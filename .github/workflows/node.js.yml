@@ -21,10 +21,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+    - name: Build
+      uses: andstor/jsdoc-action@v1
       with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm install jsdoc
-    - run: npm run docs
+        config_file: ./jsdoc.json
+        recurse: true
