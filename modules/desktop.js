@@ -147,7 +147,6 @@ export default class Desktop {
 				const link = document.createElement("a");
 				link.href = URL.createObjectURL(image);
 				link.download = `${w.children[0].children[0].innerHTML}.${store.user("saveAsExtension")}`;
-				console.log(image.type, store.user("saveAsExtension"));
 				link.click();
 			});
 		}
@@ -186,6 +185,8 @@ export default class Desktop {
 				w.style.height = (height + 30) + "px";
 				this.windows[name].call(layer => layer.resize(width, height));
 				window.dispatchEvent(new Event("resize"));
+				this.windows[name].options.width = width;
+				this.windows[name].options.height = height;
 			}
 		};
 
@@ -203,6 +204,10 @@ export default class Desktop {
 				e.preventDefault();
 				w.style.left = (e.clientX - startX) + "px";
 				w.style.top = (e.clientY - startY) + "px";
+				this.windows[name].options.position = {
+					x: e.clientX - startX,
+					y: e.clientY - startY
+				};
 			};
 		};
 

@@ -26,7 +26,7 @@
 			<div class="menu item">
 				<h5>New Project</h5>
 			</div>
-			<div class="menu item">
+			<div class="menu item" id="saveProject">
 				<h5>Save Project</h5>
 			</div>
 			<div class="menu filler"></div>
@@ -94,6 +94,7 @@
 		</div>
 		<script type="module">
 			import store from "./modules/appdata.js";
+			import desktop from "./program.js";
 			const themeSelect = document.querySelector("#theme");
 			const layoutSelect = document.querySelector("#layout");
 			const extensionSelect = document.querySelector("#extension");
@@ -126,6 +127,11 @@
 				store.user("saveAsExtension", this.value);
 			});
 			
+			// get Save Project button
+			const saveProject = document.querySelector("#saveProject");
+			saveProject.addEventListener("click", function() {
+				store.saveWindows(desktop)
+			});
 		</script>
 	</body>
 </html>

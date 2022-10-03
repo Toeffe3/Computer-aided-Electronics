@@ -53,24 +53,20 @@ class AppData {
 
     /**
      * Save/update a window
-     * @param {Window} window
+     * @param {Layered} layered
      * @returns {AppData}
      */
-    saveWindow(window) {
-        console.log(window);
+    saveWindow(layered) {
         let serilized = {
-            options: window.options,
-            htmlhook: `#${window.htmlhook.parentElement.id}`,
+            options: layered.options,
+            htmlhook: `#${layered.htmlhook.parentElement.id}`,
             layers: {}
         };
-        for(let layer of Object.keys(window.layers)) {
-            console.log(window.layers[layer]);
-            const {...object} = window.layers[layer];
+        for(let layer of Object.keys(layered.layers)) {
+            const {...object} = layered.layers[layer];
             serilized.layers[layer] = object;
         };
-        console.log(serilized);
-        this.appData.projects[this.appData.project].desktop.windows[window.htmlhook.parentElement.children[0].children[0].innerText] = LZString.compressToUTF16(JSON.stringify(serilized));
-        console.log(this);
+        this.appData.projects[this.appData.project].desktop.windows[layered.htmlhook.parentElement.children[0].children[0].innerText] = LZString.compressToUTF16(JSON.stringify(serilized));
         localStorage.setItem('appData', JSON.stringify(this.appData));
         return this;
     }
@@ -86,6 +82,14 @@ class AppData {
         Object.assign(window, windowData);
         window.name = name;
         return window;
+    }
+
+    /**
+     * Save/update all windows
+     * @param {Desktop} desktop
+     */
+    saveWindows(desktop) {
+        desktop.call((layer) => this.saveWindow(layer));
     }
 
     /**
